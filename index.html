@@ -1,0 +1,3389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Measures</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #1c1c1e;
+  --surface:    #252528;
+  --raised:     #2e2e32;
+  --border:     #3a3a3f;
+  --border2:    #48484f;
+  --text:       #e2e2e6;
+  --text-dim:   #888896;
+  --text-faint: #555560;
+  --green:      #4ade80;
+  --sans:       'IBM Plex Sans', system-ui, sans-serif;
+  --mono:       'IBM Plex Mono', monospace;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.screen { display: none; }
+.screen.active { display: flex; }
+
+/* ══ WELCOME ══ */
+#screen-welcome {
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+#screen-welcome::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.4;
+}
+
+#screen-welcome::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, var(--bg) 100%);
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.logo {
+  font-family: var(--mono);
+  font-size: 3.5rem;
+  font-weight: 500;
+  letter-spacing: 2px;
+  color: var(--text);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+}
+
+.logo-e-svg {
+  height: 0.85em;
+  width: auto;
+  overflow: visible;
+  margin: 0 0.07em;
+  align-self: baseline;
+  flex-shrink: 0;
+}
+
+.tagline {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  text-align: center;
+  margin-top: 0.75rem;
+}
+
+/* ══ BUTTONS ══ */
+.btn {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 0.65rem 1.4rem;
+  border: 1px solid var(--border2);
+  background: var(--raised);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.btn:hover { border-color: var(--text-dim); color: var(--text); background: var(--border); }
+.btn.primary { background: var(--green); border-color: var(--green); color: #0a1a10; font-weight: 600; }
+.btn.primary:hover { background: #6aea98; border-color: #6aea98; }
+
+/* ══ SETUP ══ */
+#screen-setup {
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+}
+
+#screen-setup::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.2;
+}
+
+.panel {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 420px;
+}
+
+.panel-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1rem;
+  background: var(--raised);
+  border-bottom: 1px solid var(--border);
+}
+
+.titlebar-dots { display: flex; gap: 5px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border2); }
+
+.panel-title {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-left: 0.25rem;
+}
+
+.panel-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.field { display: flex; flex-direction: column; gap: 0.3rem; }
+.field label {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.field input,
+.field select {
+  font-family: var(--mono);
+  font-size: 1rem;
+  padding: 0.5rem 0.6rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  transition: border-color 0.1s;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+}
+.field input:focus,
+.field select:focus { outline: none; border-color: var(--green); }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.field-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.setup-stat-btn {
+  font-family: var(--mono);
+  font-size: 1rem;
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.1s;
+}
+.setup-stat-btn:hover { border-color: var(--text-dim); color: var(--text); }
+.setup-stat-btn:focus { outline: none; }
+
+.field textarea {
+  font-family: var(--mono);
+  font-size: 1rem;
+  padding: 0.5rem 0.6rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  transition: border-color 0.1s;
+  width: 100%;
+  resize: none;
+  line-height: 1.5;
+}
+.field textarea:focus { outline: none; border-color: var(--green); }
+
+.panel-footer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  background: var(--raised);
+}
+.panel-footer .btn { flex: 1; }
+
+/* ══ GAME ══ */
+#screen-game { height: 100vh; flex-direction: column; }
+
+#game-toolbar {
+  height: 38px;
+  background: var(--raised);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0;
+  flex-shrink: 0;
+  /* NO overflow:hidden — must allow dropdown to escape */
+  min-width: 0;
+}
+
+#game-toolbar2 {
+  height: 32px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.toolbar-logo-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.toolbar-logo {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-right: 1px solid var(--border);
+  background: none;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.toolbar-logo:hover { background: var(--border); }
+.toolbar-logo:focus { outline: none; }
+
+/* Fixed positioning so overflow:hidden on any ancestor can't clip it */
+.toolbar-dropdown {
+  display: none;
+  position: fixed;
+  min-width: 160px;
+  background: var(--raised);
+  border: 1px solid var(--border);
+  z-index: 500;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+.toolbar-dropdown.open { display: flex; }
+
+.dropdown-item {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 0.65rem 1rem;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s, color 0.1s;
+}
+.dropdown-item:hover { background: var(--border); color: var(--text); }
+
+.toolbar-composers {
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  font-weight: 300;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 1rem 0 0.5rem;
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  height: 38px;
+  transition: background 0.1s;
+}
+.toolbar-composers:hover { background: var(--border); }
+.toolbar-composers:focus { outline: none; }
+.toolbar-composers:empty { display: none; }
+
+.toolbar-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text);
+  flex-shrink: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 0 0 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  height: 38px;
+  transition: background 0.1s;
+}
+.toolbar-name:hover { background: var(--border); }
+.toolbar-name:focus { outline: none; }
+
+.toolbar-undoredo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  border-left: 1px solid var(--border);
+}
+.toolbar-undoredo-btn {
+  width: 36px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  flex-shrink: 0;
+}
+.toolbar-undoredo-btn:hover:not(:disabled) { background: var(--border); }
+.toolbar-undoredo-btn:disabled { color: var(--text-faint); cursor: default; }
+.toolbar-undoredo-btn:focus { outline: none; }
+
+.toolbar-stats { display: flex; align-items: center; flex-shrink: 0; }
+
+.tstat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.6rem;
+  border-left: 1px solid var(--border);
+  height: 32px;
+}
+
+.tstat-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  border-left: 1px solid var(--border);
+  cursor: pointer;
+  height: 32px;
+  padding: 0 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background 0.1s;
+}
+.tstat-btn:hover { background: var(--border); }
+.tstat-btn:hover .tstat-label,
+.tstat-btn:hover .tstat-value { color: var(--text); }
+
+.end-turn-btn {
+  background: var(--green) !important;
+  border-left: 1px solid var(--green) !important;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.end-turn-btn:hover { background: #6aea98 !important; border-color: #6aea98 !important; }
+.end-turn-btn span { color: #0a1a10 !important; }
+
+.tstat-label {
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.tstat-value {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--text);
+}
+.tstat-value.highlight { color: var(--green); }
+
+#zoom-bar-wrap {
+  height: 28px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+#zoom-bar {
+  height: 28px;
+  background: #0e0e10;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 4px 0 48px;
+}
+
+#zoom-track {
+  flex: 1;
+  height: 14px;
+  background: var(--surface);
+  border-radius: 7px;
+  position: relative;
+}
+
+#zoom-thumb {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  border-radius: 7px;
+  overflow: visible;
+}
+
+.zoom-handle {
+  width: 12px;
+  flex-shrink: 0;
+  background: var(--text-dim);
+  border-radius: 7px;
+  cursor: ew-resize;
+  transition: background 0.1s;
+}
+.zoom-handle:hover { background: var(--text); }
+
+#zoom-body {
+  flex: 1;
+  background: var(--text-faint);
+  cursor: grab;
+  transition: background 0.1s;
+  min-width: 10px;
+}
+#zoom-body:hover  { background: var(--text-dim); }
+#zoom-body:active { cursor: grabbing; }
+
+#game-body {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg);
+  touch-action: none;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+}
+
+#track-header-col {
+  width: 47px;
+  flex-shrink: 0;
+  background: #0e0e10;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.2s ease;
+}
+
+#track-header-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transform-origin: 0 0;
+}
+
+#track-header-spacer {
+  flex: 1;
+}
+
+#roll-viewport {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+#roll-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 15360px;
+  height: 2000px;
+  transform-origin: 0 0;
+  background-color: #0e0e10;
+}
+
+#track-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.track-row.muted, .track-header.muted .track-header-identity,
+.track-row.soloed-out, .track-header.soloed-out .track-header-identity,
+.track-row.silent, .track-header.silent .track-header-identity {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+.track-row {
+  height: 80px;
+  width: 15360px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+
+
+.measure-cell {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.measure-cell:hover    { background: rgba(255,255,255,0.04); }
+.measure-cell.selected { background: rgba(0,200,255,0.18); box-shadow: inset 0 0 0 1px rgba(0,200,255,0.45); }
+
+.track-header {
+  height: 80px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-right: none;
+  border-left: none;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  cursor: default;
+  overflow: hidden;
+  transition: width 0.2s ease;
+  width: 47px;
+}
+
+.track-header-inner {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.4rem 0.3rem;
+  gap: 0.2rem;
+  cursor: pointer;
+  transition: background 0.1s;
+  overflow: hidden;
+}
+.track-header-inner:hover { background: var(--raised); }
+
+.track-header-identity {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+.track-header-drawer-btn {
+  width: 18px;
+  flex-shrink: 0;
+  background: var(--raised);
+  border: none;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border2);
+  color: var(--text-faint);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 0.5rem;
+  line-height: 1;
+  transition: background 0.1s, color 0.1s;
+}
+.track-header-drawer-btn:hover { background: var(--border); color: var(--text); }
+.track-header-drawer-btn:focus { outline: none; }
+
+.track-header-name {
+  display: none;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+  text-align: center;
+}
+.track-header-name-line {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.track-header-controls {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.track-ms-btn {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-faint);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  transition: all 0.1s;
+}
+.track-ms-btn:focus { outline: none; }
+.track-ms-btn.mute-btn:hover                    { border-color: var(--text-dim); color: var(--text); }
+.track-ms-btn.mute-btn.active                   { border-color: #f97316; color: #f97316; background: rgba(249,115,22,0.15); }
+.track-ms-btn.mute-btn.active:hover             { border-color: #f97316; color: #f97316; }
+.track-ms-btn.solo-btn:hover                    { border-color: var(--text-dim); color: var(--text); }
+.track-ms-btn.solo-btn.active                   { border-color: #facc15; color: #facc15; background: rgba(250,204,21,0.15); }
+.track-ms-btn.solo-btn.active:hover             { border-color: #facc15; color: #facc15; }
+.track-ms-btn.vol-btn:hover   { border-color: var(--green); color: var(--green); }
+.track-ms-btn.vol-btn.active  { border-color: var(--green); color: var(--green); background: rgba(74,222,128,0.15); }
+
+
+#add-track-btn {
+  width: 47px;
+  height: 36px;
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: 1.2rem;
+  background: var(--surface);
+  border: none;
+  border-top: 1px dashed var(--border2);
+  border-bottom: 1px dashed var(--border2);
+  color: var(--text-faint);
+  cursor: pointer;
+  transition: all 0.15s, width 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#add-track-btn:hover { background: var(--border); color: var(--green); }
+#add-track-btn:focus { outline: none; }
+
+/* ── Toast notifications ── */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80vw;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.4px;
+  color: var(--text);
+  background: rgba(30,30,34,0.92);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 0.35rem 0.9rem;
+  max-width: 80vw;
+  white-space: normal;
+  text-align: center;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.toast.toast-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.toast.toast-hiding {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+#measure-back-btn {
+  display: none;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 20;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--green);
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  padding: 0.3rem 0.65rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+#measure-back-btn:focus { outline: none; }
+#instrument-panel {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 0;
+  overflow: hidden;
+  z-index: 5;
+  background: #111113;
+}
+#instrument-panel-inner {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* ── Composer Suggestions ── */
+#composer-suggestions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--raised);
+  overflow-y: auto;
+  max-height: calc(4 * 2.4rem);
+  z-index: 10;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.composer-suggestion {
+  padding: 0.55rem 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--text);
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+}
+.composer-suggestion:last-child { border-bottom: none; }
+.composer-suggestion:active { background: var(--border); }
+
+/* ── Turn History ── */
+.history-entry {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.history-entry:last-child { border-bottom: none; }
+.history-entry:hover { background: var(--raised); }
+.history-entry.selected { background: rgba(74,222,128,0.08); border-left: 2px solid var(--green); padding-left: calc(0.75rem - 2px); }
+.history-entry-current { border-top: 1px solid var(--border); }
+.history-entry-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.history-entry-turn {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--green);
+  flex-shrink: 0;
+}
+.history-entry-composer {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text);
+  flex-shrink: 0;
+}
+.history-entry-notes-inline {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  flex: 1;
+  margin-left: auto;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.history-entry-time {
+  margin-top: 0.2rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--text-faint);
+}
+
+/* ── Drum Pads ── */
+#drum-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6px;
+  padding: 6px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+.drum-pad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+  overflow: hidden;
+  transition: filter 0.05s;
+  gap: 4px;
+}
+.drum-pad:active, .drum-pad.pressed {
+  filter: brightness(1.4);
+}
+.drum-pad-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  pointer-events: none;
+}
+.drum-pad-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* ── Piano ── */
+#piano-container {
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  background: var(--bg);
+}
+#piano-keys {
+  position: relative;
+  height: calc(100% - 4px);
+  margin-top: 4px;
+  display: inline-flex;
+  flex-direction: row;
+  padding: 0 16px;
+  box-sizing: border-box;
+  gap: 0;
+}
+.piano-white {
+  width: 44px;
+  height: 100%;
+  background: linear-gradient(180deg, #e8e8e8 0%, #ffffff 100%);
+  border: 1px solid #555;
+  border-radius: 0 0 6px 6px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.05s;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.piano-white:active, .piano-white.pressed {
+  background: linear-gradient(180deg, #b8e8ff 0%, #d0f0ff 100%);
+}
+.piano-white-label {
+  position: absolute;
+  bottom: 6px;
+  left: 0; right: 0;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 0.45rem;
+  color: rgba(0,0,0,0.35);
+  pointer-events: none;
+  user-select: none;
+}
+.piano-black {
+  width: 28px;
+  background: linear-gradient(180deg, #222 0%, #444 100%);
+  border: 1px solid #000;
+  border-radius: 0 0 4px 4px;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  cursor: pointer;
+  transition: background 0.05s;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.piano-black:active, .piano-black.pressed {
+  background: linear-gradient(180deg, #004080 0%, #0066cc 100%);
+}
+/* ── Instrument Panel ── */
+.instrument-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.1s;
+}
+.instrument-selector:hover { border-color: var(--text-dim); }
+.instrument-selector:focus { outline: none; }
+.instrument-selector-icon { font-size: 1.4rem; line-height: 1; }
+.instrument-selector-name { font-family: var(--mono); font-size: 0.9rem; flex: 1; }
+.instrument-selector-chevron { font-family: var(--mono); font-size: 1.2rem; color: var(--text-faint); }
+
+.instrument-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem 0.75rem;
+  background: var(--raised);
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+.instrument-option:hover { border-color: var(--text-dim); }
+.instrument-option.selected { border-color: var(--green); background: rgba(74,222,128,0.08); }
+.instrument-option-icon { font-size: 2rem; line-height: 1; }
+.instrument-option-name {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  text-align: center;
+}
+.instrument-option.selected .instrument-option-name { color: var(--green); }
+#instrument-list::-webkit-scrollbar { display: none; }
+
+.timesig-custom {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.timesig-custom-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+.timesig-digit {
+  font-family: var(--mono);
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--text);
+  min-width: 2rem;
+  text-align: center;
+  line-height: 1;
+}
+.timesig-slash {
+  font-family: var(--mono);
+  font-size: 2rem;
+  color: var(--text-dim);
+  line-height: 1;
+  margin-bottom: 0.1rem;
+}
+.timesig-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+.timesig-option {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  padding: 0.65rem 0.5rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.1s;
+}
+.timesig-option:hover { border-color: var(--text-dim); color: var(--text); }
+.timesig-option.selected { background: var(--green); border-color: var(--green); color: #0a1a10; font-weight: 600; }
+
+.num-stepper {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+}
+.num-stepper input {
+  flex: 1;
+  border: none;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  text-align: center;
+  min-width: 0;
+}
+.num-stepper input:focus { outline: none; border-color: var(--border); }
+.stepper-btn {
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  width: 40px;
+  height: 40px;
+  background: var(--raised);
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stepper-btn:hover { background: var(--border); color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div id="screen-welcome" class="screen active">
+  <div class="welcome-content">
+    <div>
+      <div class="logo">M<svg class="logo-e-svg" viewBox="0 -10 22 32" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="2" height="22" fill="#4ade80"/>
+        <rect x="0" y="0" width="19" height="1.2" fill="#4ade80"/>
+        <rect x="0" y="10.4" width="19" height="1.2" fill="#4ade80"/>
+        <rect x="0" y="20.8" width="19" height="1.2" fill="#4ade80"/>
+        <rect x="16.8" y="-10" width="1.4" height="11" fill="#4ade80"/>
+        <ellipse cx="12.5" cy="0.6" rx="4.5" ry="3" transform="rotate(-18,12.5,0.6)" fill="#4ade80"/>
+      </svg>ASURES</div>
+      <div class="tagline">A turn-based music game</div>
+    </div>
+    <button class="btn primary" onclick="show('screen-setup')">New Game</button>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div id="screen-setup" class="screen">
+  <div class="panel">
+    <div class="panel-titlebar">
+      <div class="titlebar-dots">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <div class="panel-title">New Game</div>
+    </div>
+    <div class="panel-body">
+      <div class="field">
+        <label>Composition Name</label>
+        <input id="f-name" type="text" placeholder="Untitled" maxlength="60">
+      </div>
+      <div class="field-row field-row-3">
+        <div class="field">
+          <label>BPM<br>&nbsp;</label>
+          <button class="setup-stat-btn" onclick="openBpmModal()"><span id="f-bpm-display">120</span></button>
+        </div>
+        <div class="field">
+          <label>Time Signature</label>
+          <button class="setup-stat-btn" onclick="openTimeSigModal()"><span id="f-timesig-display">4/4</span></button>
+        </div>
+        <div class="field">
+          <label>Measures / Turn</label>
+          <button class="setup-stat-btn" onclick="openRulesModal()"><span id="f-quota-display">4</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn" onclick="show('screen-welcome')">Back</button>
+      <button class="btn primary" onclick="startGame()">Start Game</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="screen-game" class="screen">
+  <div id="game-toolbar">
+    <div class="toolbar-logo-wrap">
+      <button class="toolbar-logo" id="menu-btn" onclick="toggleMenu()" aria-label="Menu">
+        <svg style="height:22px;width:auto;overflow:visible;display:block;margin:auto" viewBox="0 -10 22 32" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="2" height="22" fill="#4ade80"/>
+          <rect x="0" y="0" width="19" height="1.2" fill="#4ade80"/>
+          <rect x="0" y="10.4" width="19" height="1.2" fill="#4ade80"/>
+          <rect x="0" y="20.8" width="19" height="1.2" fill="#4ade80"/>
+          <rect x="16.8" y="-10" width="1.4" height="11" fill="#4ade80"/>
+          <ellipse cx="12.5" cy="0.6" rx="4.5" ry="3" transform="rotate(-18,12.5,0.6)" fill="#4ade80"/>
+        </svg>
+      </button>
+      <div class="toolbar-dropdown" id="toolbar-menu">
+        <button class="dropdown-item" id="export-btn" onclick="exportToClipboard(event)">Export</button>
+      </div>
+    </div>
+    <button class="toolbar-name" id="g-name" onclick="openInfoModal()"></button>
+    <button class="toolbar-composers" id="g-composers" onclick="openInfoModal()"></button>
+    <div class="toolbar-undoredo">
+      <button class="toolbar-undoredo-btn" id="undo-btn" onclick="undo()" title="Undo" disabled>⟲</button>
+      <button class="toolbar-undoredo-btn" id="redo-btn" onclick="redo()" title="Redo" disabled>⟳</button>
+      <button class="toolbar-undoredo-btn" id="history-btn" onclick="openHistoryModal()" title="Version History"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74"/><polyline points="3 3 3 8 8 8"/><polyline points="12 7 12 12 15 15"/></svg></button>
+    </div>
+  </div>
+  <div id="game-toolbar2">
+      <button class="tstat tstat-btn" onclick="openBpmModal()">
+        <span class="tstat-label">BPM</span>
+        <span class="tstat-value" id="g-bpm"></span>
+      </button>
+      <button class="tstat tstat-btn" onclick="openTimeSigModal()">
+        <span class="tstat-label">Time</span>
+        <span class="tstat-value" id="g-timesig"></span>
+      </button>
+      <button class="tstat tstat-btn" onclick="openRulesModal()">
+        <span class="tstat-label">Measures</span>
+        <span class="tstat-value" id="g-quota"></span>
+      </button>
+      <button class="tstat tstat-btn end-turn-btn" onclick="endTurn()">
+        <span id="g-end-turn-label">End Turn 1</span>
+      </button>
+  </div>
+  <div id="zoom-bar-wrap">
+  <div id="zoom-bar">
+    <div id="zoom-track">
+      <div id="zoom-thumb">
+        <div id="zoom-handle-l" class="zoom-handle"></div>
+        <div id="zoom-body"></div>
+        <div id="zoom-handle-r" class="zoom-handle"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <div id="game-body">
+    <div id="track-header-col">
+      <div id="track-header-list">
+        <button id="add-track-btn" onclick="quickAddTrack()">＋</button>
+      </div>
+      <div id="track-header-spacer"></div>
+    </div>
+    <div id="roll-viewport">
+      <div id="roll-canvas">
+        <div id="track-list"></div>
+      </div>
+      <button id="measure-back-btn"
+        onclick="zoomOutMeasure()"
+        ontouchstart="event.stopPropagation()"
+        onpointerdown="event.stopPropagation()">‹ Back</button>
+    </div>
+    <div id="instrument-panel">
+      <div id="instrument-panel-inner"></div>
+    </div>
+  </div>
+  <div id="toast-container"></div>
+</div>
+
+<!-- TIME SIG MODAL -->
+<div id="timesig-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center;">
+  <div class="panel" style="max-width:340px;width:90%;">
+    <div class="panel-titlebar">
+      <div class="titlebar-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="panel-title">Time Signature</div>
+    </div>
+    <div class="panel-body" style="gap:1.25rem;">
+      <div class="field">
+        <label>Custom</label>
+        <div class="timesig-custom">
+          <div class="timesig-custom-col">
+            <button class="stepper-btn" onclick="stepTimeSig('num',1)">+</button>
+            <div class="timesig-digit" id="ts-num">4</div>
+            <button class="stepper-btn" onclick="stepTimeSig('num',-1)">&#8722;</button>
+          </div>
+          <div class="timesig-slash">/</div>
+          <div class="timesig-custom-col">
+            <button class="stepper-btn" onclick="stepTimeSig('den',1)">+</button>
+            <div class="timesig-digit" id="ts-den">4</div>
+            <button class="stepper-btn" onclick="stepTimeSig('den',-1)">&#8722;</button>
+          </div>
+          <button class="btn" id="metro-btn" onclick="toggleMetronome()" style="margin-left:auto;padding:0.5rem 0.9rem;font-size:1rem;">&#9654;</button>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border);margin:0 -1.5rem;"></div>
+      <div class="field">
+        <label>Presets</label>
+        <div class="timesig-grid" id="timesig-grid"></div>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn" onclick="closeTimeSigModal()">Cancel</button>
+      <button class="btn primary" onclick="confirmTimeSig()">Set</button>
+    </div>
+  </div>
+</div>
+
+<!-- RULES MODAL -->
+<div id="rules-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center;">
+  <div class="panel" style="max-width:320px;width:90%;">
+    <div class="panel-titlebar">
+      <div class="titlebar-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="panel-title">Rules</div>
+    </div>
+    <div class="panel-body">
+      <div class="field">
+        <label>Measures each player may edit per turn</label>
+        <div class="num-stepper">
+          <button class="stepper-btn" onclick="stepQuota(-1)">&#8722;</button>
+          <input id="quota-input" type="number" min="1" max="32">
+          <button class="stepper-btn" onclick="stepQuota(1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn" onclick="closeRulesModal()">Cancel</button>
+      <button class="btn primary" onclick="confirmRules()">Set</button>
+    </div>
+  </div>
+</div>
+
+<!-- BPM MODAL -->
+<div id="bpm-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center;">
+  <div class="panel" style="max-width:280px;width:90%;">
+    <div class="panel-titlebar">
+      <div class="titlebar-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="panel-title">Change BPM</div>
+    </div>
+    <div class="panel-body">
+      <div class="field">
+        <label>BPM</label>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <div class="num-stepper" style="flex:1;">
+            <button class="stepper-btn" onclick="stepBpm(-1)">&#8722;</button>
+            <input id="bpm-input" type="number" min="40" max="240">
+            <button class="stepper-btn" onclick="stepBpm(1)">+</button>
+          </div>
+          <button class="btn" id="bpm-metro-btn" onclick="toggleBpmMetronome()" style="padding:0.5rem 0.9rem;font-size:1rem;">&#9654;</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn" onclick="closeBpmModal()">Cancel</button>
+      <button class="btn primary" onclick="confirmBpm()">Set BPM</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPOSITION INFO MODAL -->
+<div id="info-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center;">
+  <div class="panel" style="max-width:420px;width:90%;">
+    <div class="panel-titlebar">
+      <div class="titlebar-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="panel-title">Composition Info</div>
+    </div>
+    <div class="panel-body">
+      <div class="field">
+        <label>Composition Name</label>
+        <input id="info-name" type="text" maxlength="60">
+      </div>
+      <div class="field">
+        <label>Notes</label>
+        <textarea id="info-notes" rows="3"></textarea>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn" onclick="closeInfoModal()">Cancel</button>
+      <button class="btn primary" onclick="confirmInfo()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- TURN HISTORY -->
+<div id="history-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:center;justify-content:center;">
+  <div class="panel" style="max-width:340px;width:90%;max-height:70vh;display:flex;flex-direction:column;">
+    <div class="panel-titlebar">
+      <div class="titlebar-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="panel-title">Turn History</div>
+    </div>
+    <div id="history-list" style="flex:1;overflow-y:auto;padding:0.5rem 0;min-height:120px;">
+      <div style="display:flex;align-items:center;justify-content:center;height:100%;padding:2rem;font-family:var(--mono);font-size:0.75rem;color:var(--text-faint);">No turns recorded yet.</div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn" onclick="closeHistoryModal()">Close</button>
+      <button class="btn primary" id="history-view-btn" onclick="restoreHistoryEntry()" disabled>View</button>
+      <button class="btn" id="history-restore-btn" onclick="hardRestoreHistoryEntry()" disabled>Restore</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPOSER NAME PROMPT -->
+<div id="composer-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:center;justify-content:center;">
+  <div class="panel" style="max-width:300px;width:90%;">
+    <div class="panel-titlebar">
+      <div class="titlebar-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="panel-title">End Turn</div>
+    </div>
+    <div class="panel-body">
+      <div class="field">
+        <label>Your name</label>
+        <div style="position:relative;">
+          <input id="composer-name-input" type="text" maxlength="40" autocomplete="name" placeholder="Enter your name">
+          <div id="composer-suggestions" style="display:none;"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Turn Notes</label>
+        <textarea id="turn-notes-input" rows="3" placeholder="What did you do this turn?"></textarea>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn" onclick="closeComposerPrompt()">Cancel</button>
+      <button class="btn primary" onclick="confirmEndTurn()">End Turn</button>
+    </div>
+  </div>
+</div>
+
+<!-- INSTRUMENT TRACK MODAL -->
+<!-- VOLUME MODAL -->
+<div id="volume-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:center;justify-content:center;">
+  <div class="panel" style="max-width:320px;width:90%;">
+    <div class="panel-titlebar">
+      <div class="titlebar-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="panel-title">Track Volume</div>
+    </div>
+    <div class="panel-body" style="gap:1.25rem;">
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <span style="font-size:1.2rem;">🔇</span>
+        <input id="volume-slider" type="range" min="0" max="100" value="80"
+          style="flex:1;accent-color:var(--green);height:4px;">
+        <span style="font-size:1.2rem;">🔊</span>
+      </div>
+      <div style="text-align:center;">
+        <span id="volume-display" style="font-family:var(--mono);font-size:1.4rem;color:var(--green);">80</span>
+        <span style="font-family:var(--mono);font-size:0.75rem;color:var(--text-faint);margin-left:4px;">%</span>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn" onclick="closeVolumeModal()">Cancel</button>
+      <button class="btn primary" onclick="confirmVolume()">Set Volume</button>
+    </div>
+  </div>
+</div>
+
+<div id="new-track-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center;">
+  <div class="panel" style="max-width:380px;width:90%;">
+    <div class="panel-titlebar">
+      <div class="titlebar-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="panel-title">Instrument Track</div>
+    </div>
+    <div class="panel-body">
+      <div class="field">
+        <label>Track Name</label>
+        <input id="new-track-name" type="text" maxlength="40">
+      </div>
+      <div class="field">
+        <label>Instrument</label>
+        <button class="instrument-selector" id="instrument-selector-btn" onclick="openInstrumentPicker()">
+          <span class="instrument-selector-icon" id="selected-instrument-icon">🎹</span>
+          <span class="instrument-selector-name" id="selected-instrument-name">Piano</span>
+          <span class="instrument-selector-chevron">›</span>
+        </button>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn" onclick="closeNewTrackModal()">Cancel</button>
+      <button class="btn primary" id="confirm-track-btn" onclick="confirmNewTrack()">Add Track</button>
+    </div>
+  </div>
+</div>
+
+<!-- INSTRUMENT PICKER MODAL -->
+<div id="instrument-picker-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:flex-end;justify-content:center;">
+  <div style="width:100%;max-width:600px;background:var(--surface);border-top:1px solid var(--border);">
+    <div class="panel-titlebar" style="border-bottom:1px solid var(--border);">
+      <div class="titlebar-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="panel-title">Choose Instrument</div>
+    </div>
+    <div id="instrument-list" style="display:flex;flex-direction:row;overflow-x:auto;padding:1.5rem 1rem;gap:1rem;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+    </div>
+    <div style="padding:1rem 1.5rem;border-top:1px solid var(--border);background:var(--raised);">
+      <button class="btn" style="width:100%;" onclick="closeInstrumentPicker()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+let G = null;
+let turnHistory = [];
+let isRestored = false;
+let currentSnapshot = null;
+let setup = { bpm: 120, timeSig: '4/4', quota: 4 };
+
+// ── Undo / Redo ──
+const UNDO_MAX = 500;
+const undoStack = [];
+const redoStack = [];
+
+function canEdit() {
+  if (!isRestored) return true;
+  consoleMsg('Return to Current to make changes.');
+  return false;
+}
+
+function pushUndo() {
+  if (!G) return;
+  undoStack.push(JSON.stringify(G));
+  if (undoStack.length > UNDO_MAX) undoStack.shift();
+  redoStack.length = 0;
+  updateUndoRedoBtns();
+}
+
+function undo() {
+  if (!undoStack.length) return;
+  redoStack.push(JSON.stringify(G));
+  G = JSON.parse(undoStack.pop());
+  refreshGameUI();
+  updateUndoRedoBtns();
+}
+
+function redo() {
+  if (!redoStack.length) return;
+  undoStack.push(JSON.stringify(G));
+  G = JSON.parse(redoStack.pop());
+  refreshGameUI();
+  updateUndoRedoBtns();
+}
+
+function updateUndoRedoBtns() {
+  const u = document.getElementById('undo-btn');
+  const r = document.getElementById('redo-btn');
+  if (u) u.disabled = isRestored || undoStack.length === 0;
+  if (r) r.disabled = isRestored || redoStack.length === 0;
+}
+
+function refreshGameUI() {
+  document.getElementById('g-name').textContent      = G.name;
+  document.getElementById('g-composers').textContent = G.composers && G.composers.length ? 'by: ' + G.composers.join(', ') : '';
+  document.getElementById('g-bpm').textContent       = G.bpm;
+  document.getElementById('g-timesig').textContent   = G.timeSig;
+  document.getElementById('g-quota').textContent     = G.measuresPerTurn;
+  document.getElementById('g-end-turn-label').textContent = 'End Turn ' + G.turnNumber;
+  // Rebuild track DOM only — do NOT call addTrack() which mutates G.tracks
+  const headerList = document.getElementById('track-header-list');
+  const trackList  = document.getElementById('track-list');
+  headerList.querySelectorAll('.track-header').forEach(el => el.remove());
+  trackList.querySelectorAll('.track-row').forEach(el => el.remove());
+  const savedTracks = G.tracks.slice();
+  G._rebuilding = true;
+  G.tracks = [];
+  savedTracks.forEach(t => addTrack(t.name, INSTRUMENTS.find(i => i.id === t.instrument) || INSTRUMENTS[0]));
+  G._rebuilding = false;
+  G.tracks = savedTracks; // restore correct state — addTrack DOM rebuild only
+  updateTrackGrids();
+  applyZoom();
+}
+
+function startGame() {
+  const name = document.getElementById('f-name').value.trim() || 'Untitled';
+  G = {
+    version: 1, name,
+    composers: [], notes: '',
+    bpm: setup.bpm, timeSig: setup.timeSig,
+    measuresPerTurn: setup.quota,
+    turnNumber: 1, tracks: []
+  };
+  document.getElementById('g-name').textContent      = name;
+  document.getElementById('g-composers').textContent = '';
+  document.getElementById('g-bpm').textContent       = setup.bpm;
+  document.getElementById('g-timesig').textContent = setup.timeSig;
+  document.getElementById('g-quota').textContent   = setup.quota;
+  document.getElementById('g-end-turn-label').textContent = 'End Turn 1';
+  turnHistory = [];
+  isRestored = false;
+  currentSnapshot = null;
+  show('screen-game');
+}
+
+// ── Menu ──
+let menuClosedAt = 0;
+
+function toggleMenu() {
+  const menu = document.getElementById('toolbar-menu');
+  const btn  = document.getElementById('menu-btn');
+  const opening = !menu.classList.contains('open');
+  menu.classList.toggle('open', opening);
+  if (opening) {
+    const rect = btn.getBoundingClientRect();
+    menu.style.top  = rect.bottom + 'px';
+    menu.style.left = rect.left + 'px';
+  } else {
+    menuClosedAt = Date.now();
+  }
+}
+
+document.addEventListener('click', e => {
+  const menu = document.getElementById('toolbar-menu');
+  const btn  = document.getElementById('menu-btn');
+  if (menu && btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+    if (menu.classList.contains('open')) menuClosedAt = Date.now();
+    menu.classList.remove('open');
+  }
+});
+
+// Capture-phase listener blocks ghost clicks within 350ms of menu closing
+document.addEventListener('click', e => {
+  if (Date.now() - menuClosedAt < 350 &&
+      !document.getElementById('menu-btn').contains(e.target) &&
+      !document.getElementById('toolbar-menu').contains(e.target)) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+}, true);
+
+function exportToClipboard(e) {
+  e && e.stopPropagation();
+  menuClosedAt = Date.now();
+  document.getElementById('toolbar-menu').classList.remove('open');
+  if (!G) return;
+  const json = JSON.stringify(G, null, 2);
+  navigator.clipboard.writeText(json).then(() => {
+    consoleMsg('Copied to clipboard.');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = json;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    consoleMsg('Copied to clipboard.');
+  });
+}
+
+function endTurn() {
+  if (!G || !canEdit()) return;
+  document.getElementById('composer-name-input').value = '';
+  document.getElementById('turn-notes-input').value = '';
+  const input = document.getElementById('composer-name-input');
+  const suggestions = document.getElementById('composer-suggestions');
+  suggestions.innerHTML = '';
+  suggestions.style.display = 'none';
+  if (G && G.composers && G.composers.length) {
+    G.composers.forEach(name => {
+      const opt = document.createElement('div');
+      opt.className = 'composer-suggestion';
+      opt.textContent = name;
+      opt.addEventListener('mousedown', e => {
+        e.preventDefault();
+        input.value = name;
+        input.blur();
+        suggestions.style.display = 'none';
+      });
+      opt.addEventListener('touchstart', e => {
+        e.preventDefault();
+        input.value = name;
+        input.blur();
+        suggestions.style.display = 'none';
+      }, { passive: false });
+      suggestions.appendChild(opt);
+    });
+    input.addEventListener('focus', () => { suggestions.style.display = 'block'; });
+    input.addEventListener('blur', () => { setTimeout(() => { suggestions.style.display = 'none'; }, 100); });
+  }
+  document.getElementById('composer-overlay').style.display = 'flex';
+
+}
+function closeComposerPrompt() {
+  document.getElementById('composer-overlay').style.display = 'none';
+}
+function confirmEndTurn() {
+  if (!G) return closeComposerPrompt();
+  const name = document.getElementById('composer-name-input').value.trim();
+  if (!name) { consoleMsg('Please enter your name to end the turn.'); return; }
+  closeComposerPrompt();
+  // Add composer if name given and not already in list (case-insensitive)
+  if (name) {
+    const already = G.composers.some(c => c.toLowerCase() === name.toLowerCase());
+    if (!already) {
+      G.composers.push(name);
+      document.getElementById('g-composers').textContent = 'by: ' + G.composers.join(', ');
+    }
+  }
+  isRestored = false;
+  updateUndoRedoBtns();
+  // Record turn history entry — snapshot is composition only, not turnHistory
+  const turnNotes = document.getElementById('turn-notes-input').value.trim();
+  turnHistory.push({
+    turn: G.turnNumber,
+    composer: name || null,
+    timestamp: new Date().toISOString(),
+    notes: turnNotes || null,
+    snapshot: JSON.stringify(G),
+  });
+  G.turnNumber += 1;
+  document.getElementById('g-end-turn-label').textContent = 'End Turn ' + G.turnNumber;
+  const json = JSON.stringify({ composition: G, turnHistory }, null, 2);
+  navigator.clipboard.writeText(json).then(() => {
+    consoleMsg(`Turn ${G.turnNumber - 1} ended. State copied to clipboard — share it with the next player.`);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = json;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    consoleMsg(`Turn ${G.turnNumber - 1} ended. State copied to clipboard — share it with the next player.`);
+  });
+}
+
+// ── Pan & Zoom ──
+const viewport    = document.getElementById('roll-viewport');
+const canvas      = document.getElementById('roll-canvas');
+const headerList  = document.getElementById('track-header-list');
+
+let panX = 0, panY = 0;
+let scaleX = 1;
+let velX = 0, velY = 0;
+let zoomAnimFrame = null;
+let inertiaFrame = null;
+const FRICTION = 0.92;
+const CANVAS_BASE_W = 15360; // kept for zoom bar math
+const MEASURE_W = 120;
+const TOTAL_MEASURES = 128;
+
+
+function applyTransform() {
+  canvas.style.transform = `translate(${panX}px, ${panY}px)`;
+  canvas.style.transformOrigin = '0 0';
+  if (!zoomAnimFrame) headerList.style.transform = `translateY(${panY}px)`;
+  updateZoomBar();
+}
+
+function clampPan() {
+  const rect = viewport.getBoundingClientRect();
+  const canvasW = TOTAL_MEASURES * MEASURE_W * scaleX;
+  panX = Math.min(0, Math.max(rect.width  - canvasW, panX));
+  panY = Math.min(0, Math.max(rect.height - canvas.offsetHeight, panY));
+}
+
+function applyZoom() {
+  const canvasW = TOTAL_MEASURES * MEASURE_W * scaleX;
+  canvas.style.width = canvasW + 'px';
+  updateTrackGrids();
+  clampPan();
+  applyTransform();
+}
+
+// ── Zoom Scrollbar ──
+const zoomTrack   = document.getElementById('zoom-track');
+const zoomThumb   = document.getElementById('zoom-thumb');
+const zoomBody    = document.getElementById('zoom-body');
+const zoomHandleL = document.getElementById('zoom-handle-l');
+const zoomHandleR = document.getElementById('zoom-handle-r');
+
+const MIN_SCALE = 0.05;
+const MAX_SCALE = 8;
+// Thumb fraction range — thumb is always this proportion of the track, regardless of zoom
+const MIN_THUMB_FRAC = 0.12;
+const MAX_THUMB_FRAC = 0.88;
+
+// Convert thumb width fraction → scaleX (logarithmic)
+function thumbFracToScale(frac) {
+  const t = (frac - MIN_THUMB_FRAC) / (MAX_THUMB_FRAC - MIN_THUMB_FRAC);
+  // Wide thumb = zoomed out (low scale), narrow thumb = zoomed in (high scale)
+  return Math.exp(Math.log(MAX_SCALE) + t * (Math.log(MIN_SCALE) - Math.log(MAX_SCALE)));
+}
+
+// Convert scaleX → thumb width fraction (inverse)
+function scaleToThumbFrac(s) {
+  const t = (Math.log(s) - Math.log(MAX_SCALE)) / (Math.log(MIN_SCALE) - Math.log(MAX_SCALE));
+  return MIN_THUMB_FRAC + t * (MAX_THUMB_FRAC - MIN_THUMB_FRAC);
+}
+
+// Convert thumb left fraction (0–1 of usable range) → panX
+function thumbPosToPanX(posFrac, trackW, thumbW) {
+  const usable = trackW - thumbW;
+  const totalScrollable = TOTAL_MEASURES * MEASURE_W * scaleX - viewport.offsetWidth;
+  return -(posFrac * usable / (usable || 1)) * totalScrollable;
+}
+
+// Convert panX → thumb left fraction
+function panXToThumbPosFrac(trackW, thumbW) {
+  const totalScrollable = CANVAS_BASE_W * scaleX - viewport.offsetWidth;
+  if (totalScrollable <= 0) return 0;
+  const usable = trackW - thumbW;
+  return (-panX / totalScrollable) * (usable / (usable || 1));
+}
+
+function updateZoomBar() {
+  const trackW  = zoomTrack.offsetWidth;
+  const thumbFrac = scaleToThumbFrac(scaleX);
+  const thumbW  = thumbFrac * trackW;
+  const canvasW = TOTAL_MEASURES * MEASURE_W * scaleX;
+  const totalScrollable = canvasW - viewport.offsetWidth;
+  const posFrac = totalScrollable > 0 ? (-panX / totalScrollable) : 0;
+  const usable  = trackW - thumbW;
+  const thumbL  = Math.max(0, Math.min(usable, posFrac * usable));
+  zoomThumb.style.width = thumbW + 'px';
+  zoomThumb.style.left  = thumbL + 'px';
+}
+
+function applyFromThumb(thumbL, thumbW) {
+  const trackW = zoomTrack.offsetWidth;
+  const frac   = thumbW / trackW;
+  scaleX = thumbFracToScale(Math.max(MIN_THUMB_FRAC, Math.min(MAX_THUMB_FRAC, frac)));
+  const posFrac = thumbL / Math.max(1, trackW - thumbW);
+  panX = thumbPosToPanX(posFrac, trackW, thumbW);
+  applyZoom();
+}
+
+// Body drag — pan only, preserves zoom
+let zbDrag = null;
+function startZbDrag(clientX) {
+  const tr = zoomTrack.getBoundingClientRect();
+  const th = zoomThumb.getBoundingClientRect();
+  zbDrag = { startX: clientX, startL: th.left - tr.left, thumbW: th.width };
+}
+zoomBody.addEventListener('mousedown', e => { e.stopPropagation(); startZbDrag(e.clientX); window.addEventListener('mousemove', onZbMove); window.addEventListener('mouseup', onZbUp); });
+zoomBody.addEventListener('touchstart', e => { e.stopPropagation(); e.preventDefault(); startZbDrag(e.touches[0].clientX); window.addEventListener('touchmove', onZbMoveT, { passive: false }); window.addEventListener('touchend', onZbUpT); }, { passive: false });
+function onZbMove(e) {
+  if (!zbDrag) return;
+  const trackW = zoomTrack.offsetWidth;
+  const dx = e.clientX - zbDrag.startX;
+  const newL = Math.max(0, Math.min(trackW - zbDrag.thumbW, zbDrag.startL + dx));
+  applyFromThumb(newL, zbDrag.thumbW);
+}
+function onZbMoveT(e) { e.preventDefault(); onZbMove(e.touches[0]); }
+function onZbUp()  { zbDrag = null; window.removeEventListener('mousemove', onZbMove); window.removeEventListener('mouseup', onZbUp); }
+function onZbUpT() { zbDrag = null; window.removeEventListener('touchmove', onZbMoveT); window.removeEventListener('touchend', onZbUpT); }
+
+// Left handle drag — moves left edge, changes zoom
+let zhLDrag = null;
+function startZhLDrag(clientX) {
+  const tr = zoomTrack.getBoundingClientRect();
+  const th = zoomThumb.getBoundingClientRect();
+  zhLDrag = { startX: clientX, startL: th.left - tr.left, startR: th.right - tr.left };
+}
+zoomHandleL.addEventListener('mousedown', e => { e.stopPropagation(); startZhLDrag(e.clientX); window.addEventListener('mousemove', onZhLMove); window.addEventListener('mouseup', onZhLUp); });
+zoomHandleL.addEventListener('touchstart', e => { e.stopPropagation(); e.preventDefault(); startZhLDrag(e.touches[0].clientX); window.addEventListener('touchmove', onZhLMoveT, { passive: false }); window.addEventListener('touchend', onZhLUpT); }, { passive: false });
+function onZhLMove(e) {
+  if (!zhLDrag) return;
+  const trackW = zoomTrack.offsetWidth;
+  const dx  = e.clientX - zhLDrag.startX;
+  const newL = Math.max(0, Math.min(zhLDrag.startR - trackW * MIN_THUMB_FRAC, zhLDrag.startL + dx));
+  const newW = zhLDrag.startR - newL;
+  applyFromThumb(newL, newW);
+}
+function onZhLMoveT(e) { e.preventDefault(); onZhLMove(e.touches[0]); }
+function onZhLUp()  { zhLDrag = null; window.removeEventListener('mousemove', onZhLMove); window.removeEventListener('mouseup', onZhLUp); }
+function onZhLUpT() { zhLDrag = null; window.removeEventListener('touchmove', onZhLMoveT); window.removeEventListener('touchend', onZhLUpT); }
+
+// Right handle drag — moves right edge, changes zoom
+let zhRDrag = null;
+function startZhRDrag(clientX) {
+  const tr = zoomTrack.getBoundingClientRect();
+  const th = zoomThumb.getBoundingClientRect();
+  zhRDrag = { startX: clientX, startL: th.left - tr.left, startW: th.width };
+}
+zoomHandleR.addEventListener('mousedown', e => { e.stopPropagation(); startZhRDrag(e.clientX); window.addEventListener('mousemove', onZhRMove); window.addEventListener('mouseup', onZhRUp); });
+zoomHandleR.addEventListener('touchstart', e => { e.stopPropagation(); e.preventDefault(); startZhRDrag(e.touches[0].clientX); window.addEventListener('touchmove', onZhRMoveT, { passive: false }); window.addEventListener('touchend', onZhRUpT); }, { passive: false });
+function onZhRMove(e) {
+  if (!zhRDrag) return;
+  const trackW = zoomTrack.offsetWidth;
+  const dx  = e.clientX - zhRDrag.startX;
+  const newW = Math.max(trackW * MIN_THUMB_FRAC, Math.min(trackW - zhRDrag.startL, zhRDrag.startW + dx));
+  applyFromThumb(zhRDrag.startL, newW);
+}
+function onZhRMoveT(e) { e.preventDefault(); onZhRMove(e.touches[0]); }
+function onZhRUp()  { zhRDrag = null; window.removeEventListener('mousemove', onZhRMove); window.removeEventListener('mouseup', onZhRUp); }
+function onZhRUpT() { zhRDrag = null; window.removeEventListener('touchmove', onZhRMoveT); window.removeEventListener('touchend', onZhRUpT); }
+
+
+function startInertia() {
+  if (inertiaFrame) cancelAnimationFrame(inertiaFrame);
+  function step() {
+    velX *= FRICTION;
+    velY *= FRICTION;
+    if (Math.abs(velX) < 0.2 && Math.abs(velY) < 0.2) { velX = 0; velY = 0; return; }
+    panX += velX;
+    panY += velY;
+    clampPan();
+    applyTransform();
+    inertiaFrame = requestAnimationFrame(step);
+  }
+  inertiaFrame = requestAnimationFrame(step);
+}
+
+// Single-finger pan
+let panTouch = null;
+
+let panMoved = false;
+
+viewport.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (zoomAnimFrame) return;
+  panMoved = false;
+  if (inertiaFrame) { cancelAnimationFrame(inertiaFrame); velX = 0; velY = 0; }
+  if (e.touches.length === 1) {
+    panTouch = { id: e.touches[0].identifier, x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }
+}, { passive: false });
+
+viewport.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (zoomAnimFrame || measureZoomed) return;
+  if (e.touches.length === 1 && panTouch) {
+    const t = e.touches[0];
+    const dx = t.clientX - panTouch.x;
+    const dy = t.clientY - panTouch.y;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) panMoved = true;
+    velX = dx; velY = dy;
+    panX += dx; panY += dy;
+    panTouch = { id: t.identifier, x: t.clientX, y: t.clientY };
+    clampPan();
+    applyTransform();
+  }
+}, { passive: false });
+
+viewport.addEventListener('touchend', e => {
+  if (e.touches.length === 0) { panTouch = null; startInertia(); }
+}, { passive: true });
+
+// Mouse wheel scrolls horizontally (desktop)
+viewport.addEventListener('wheel', e => {
+  e.preventDefault();
+  panX -= e.deltaX || e.deltaY;
+  clampPan();
+  applyTransform();
+}, { passive: false });
+
+// Mouse drag pan (desktop)
+let mouseDrag = null;
+viewport.addEventListener('mousedown', e => {
+  if (zoomAnimFrame || measureZoomed) return;
+  if (inertiaFrame) { cancelAnimationFrame(inertiaFrame); velX = 0; velY = 0; }
+  mouseDrag = { x: e.clientX, y: e.clientY };
+});
+window.addEventListener('mousemove', e => {
+  if (!mouseDrag) return;
+  const dx = e.clientX - mouseDrag.x;
+  const dy = e.clientY - mouseDrag.y;
+  velX = dx; velY = dy;
+  panX += dx; panY += dy;
+  mouseDrag = { x: e.clientX, y: e.clientY };
+  clampPan();
+  applyTransform();
+});
+window.addEventListener('mouseup', () => { if (mouseDrag) { mouseDrag = null; startInertia(); } });
+
+applyZoom();
+window.addEventListener('resize', updateZoomBar);
+
+// ── Instruments ──
+const INSTRUMENTS = [
+  { id: 'piano',       name: 'Piano',       icon: '🎹' },
+  { id: 'bass',        name: 'Bass',        icon: '🎸' },
+  { id: 'lead',        name: 'Lead Synth',  icon: '🎛️' },
+  { id: 'pad',         name: 'Pad',         icon: '🌊' },
+  { id: 'organ',       name: 'Organ',       icon: '⛪' },
+  { id: 'vibraphone',  name: 'Vibraphone',  icon: '🔔' },
+  { id: 'plucked',     name: 'Plucked',     icon: '🪕' },
+  { id: 'flute',       name: 'Flute',       icon: '🎵' },
+  { id: 'brass',       name: 'Brass',       icon: '🎺' },
+  { id: 'harpsichord', name: 'Harpsichord', icon: '🎼' },
+  { id: 'drums',       name: 'Drum Kit',    icon: '🥁' },
+];
+let selectedInstrument = INSTRUMENTS[0];
+
+let editingTrackIndex = -1;
+
+function quickAddTrack() {
+  if (!canEdit()) return;
+  trackCount++;
+  addTrack('Track ' + trackCount, selectedInstrument);
+}
+
+function openNewTrackModal() {
+  editingTrackIndex = -1;
+  trackCount++;
+  document.getElementById('new-track-name').value = 'Track ' + trackCount;
+  selectedInstrument = INSTRUMENTS[0];
+  document.getElementById('selected-instrument-icon').textContent = selectedInstrument.icon;
+  document.getElementById('selected-instrument-name').textContent = selectedInstrument.name;
+  document.getElementById('confirm-track-btn').textContent = 'Add Track';
+  document.getElementById('new-track-overlay').style.display = 'flex';
+  setTimeout(() => { const f = document.getElementById('new-track-name'); f.focus(); f.select(); }, 50);
+}
+
+function openEditTrackModal(index) {
+  if (!G || !G.tracks[index]) return;
+  editingTrackIndex = index;
+  const track = G.tracks[index];
+  document.getElementById('new-track-name').value = track.name;
+  selectedInstrument = INSTRUMENTS.find(i => i.id === track.instrument) || INSTRUMENTS[0];
+  document.getElementById('selected-instrument-icon').textContent = selectedInstrument.icon;
+  document.getElementById('selected-instrument-name').textContent = selectedInstrument.name;
+  document.getElementById('confirm-track-btn').textContent = 'Update Track';
+  document.getElementById('new-track-overlay').style.display = 'flex';
+  setTimeout(() => { const f = document.getElementById('new-track-name'); f.focus(); f.select(); }, 50);
+}
+
+function closeNewTrackModal() {
+  if (editingTrackIndex === -1) trackCount--;
+  document.getElementById('new-track-overlay').style.display = 'none';
+}
+
+function confirmNewTrack() {
+  if (!canEdit()) return;
+  const name = document.getElementById('new-track-name').value.trim() || ('Track ' + trackCount);
+  if (editingTrackIndex >= 0) {
+    // Update existing track
+    if (G) {
+      pushUndo();
+      G.tracks[editingTrackIndex].name = name;
+      G.tracks[editingTrackIndex].instrument = selectedInstrument.id;
+    }
+    const headers = document.getElementById('track-header-list').querySelectorAll('.track-header');
+    const header = headers[editingTrackIndex];
+    if (header) {
+      header.querySelector('.track-icon').textContent = selectedInstrument.icon;
+      renderTrackName(header.querySelector('.track-header-name'), name);
+    }
+  } else {
+    addTrack(name, selectedInstrument);
+  }
+  document.getElementById('new-track-overlay').style.display = 'none';
+}
+
+function openInstrumentPicker() {
+  const list = document.getElementById('instrument-list');
+  list.innerHTML = '';
+  INSTRUMENTS.forEach(inst => {
+    const btn = document.createElement('button');
+    btn.className = 'instrument-option' + (inst.id === selectedInstrument.id ? ' selected' : '');
+    btn.innerHTML = `
+      <span class="instrument-option-icon">${inst.icon}</span>
+      <span class="instrument-option-name">${inst.name}</span>
+    `;
+    btn.onclick = () => {
+      selectedInstrument = inst;
+      document.getElementById('selected-instrument-icon').textContent = inst.icon;
+      document.getElementById('selected-instrument-name').textContent = inst.name;
+      closeInstrumentPicker();
+    };
+    list.appendChild(btn);
+  });
+  document.getElementById('instrument-picker-overlay').style.display = 'flex';
+}
+
+function closeInstrumentPicker() {
+  document.getElementById('instrument-picker-overlay').style.display = 'none';
+}
+
+function applySolo() {
+  const headers = Array.from(document.getElementById('track-header-list').querySelectorAll('.track-header'));
+  const rows    = Array.from(document.getElementById('track-list').querySelectorAll('.track-row'));
+  const anySoloed = headers.some(h => h.querySelector('.solo-btn')?.classList.contains('active'));
+  headers.forEach((h, i) => {
+    const soloed = h.querySelector('.solo-btn')?.classList.contains('active');
+    const dimmed = anySoloed && !soloed;
+    h.classList.toggle('soloed-out', dimmed);
+    if (rows[i]) rows[i].classList.toggle('soloed-out', dimmed);
+  });
+}
+
+// ── Volume Modal ──
+let volumeTrackIndex = -1;
+
+function openVolumeModal(index) {
+  volumeTrackIndex = index;
+  const vol = (G && G.tracks[index] && G.tracks[index].volume != null) ? G.tracks[index].volume : 80;
+  const slider = document.getElementById('volume-slider');
+  slider.value = vol;
+  document.getElementById('volume-display').textContent = vol;
+  slider.oninput = () => document.getElementById('volume-display').textContent = slider.value;
+  document.getElementById('volume-overlay').style.display = 'flex';
+}
+
+function closeVolumeModal() {
+  document.getElementById('volume-overlay').style.display = 'none';
+}
+
+function confirmVolume() {
+  if (!canEdit()) return;
+  const vol = parseInt(document.getElementById('volume-slider').value);
+  if (G && G.tracks[volumeTrackIndex]) { pushUndo(); G.tracks[volumeTrackIndex].volume = vol; }
+  const headers = document.getElementById('track-header-list').querySelectorAll('.track-header');
+  const btn = headers[volumeTrackIndex]?.querySelector('.vol-btn');
+  if (btn) {
+    btn.textContent = vol === 0 ? '🔇' : '🔉';
+    btn.classList.toggle('active', vol !== 80);
+  }
+  const rows = document.getElementById('track-list').querySelectorAll('.track-row');
+  const silent = vol === 0;
+  if (headers[volumeTrackIndex]) headers[volumeTrackIndex].classList.toggle('silent', silent);
+  if (rows[volumeTrackIndex])    rows[volumeTrackIndex].classList.toggle('silent', silent);
+  closeVolumeModal();
+  consoleMsg(`Track ${volumeTrackIndex + 1} volume: ${vol}%`);
+}
+
+
+const HEADER_W_CLOSED = 47;
+const HEADER_W_OPEN   = 135;
+let drawerOpen = false;
+
+function toggleDrawer(e) {
+  drawerOpen = !drawerOpen;
+  const w = drawerOpen ? HEADER_W_OPEN : HEADER_W_CLOSED;
+  document.getElementById('track-header-col').style.width = w + 'px';
+  document.getElementById('add-track-btn').style.width = w + 'px';
+  document.getElementById('zoom-bar').style.paddingLeft = (w + 1) + 'px';
+  document.querySelectorAll('.track-header').forEach(h => {
+    h.style.width = w + 'px';
+    h.querySelector('.track-header-drawer-btn').textContent = drawerOpen ? '❮' : '❯';
+    h.querySelector('.track-header-name').style.display = drawerOpen ? 'block' : 'none';
+    h.querySelector('.track-header-controls').style.display = drawerOpen ? 'flex' : 'none';
+    const inner = h.querySelector('.track-header-inner');
+    inner.style.alignItems = drawerOpen ? 'center' : 'center';
+    inner.style.padding = drawerOpen ? '0.4rem 0.3rem' : '0.4rem 0.3rem';
+  });
+}
+
+
+function splitTrackName(name) {
+  if (name.length <= 8) return [name, ''];
+  // Find word boundary nearest the midpoint
+  const mid = Math.floor(name.length / 2);
+  const spaces = [...name.matchAll(/ /g)].map(m => m.index);
+  if (spaces.length === 0) {
+    // No spaces — hard split at midpoint
+    return [name.slice(0, mid), name.slice(mid)];
+  }
+  const best = spaces.reduce((a, b) => Math.abs(a - mid) <= Math.abs(b - mid) ? a : b);
+  return [name.slice(0, best), name.slice(best + 1)];
+}
+
+function renderTrackName(el, name) {
+  const [line1, line2] = splitTrackName(name);
+  el.innerHTML = `<div class="track-header-name-line">${line1}</div><div class="track-header-name-line">${line2}</div>`;
+}
+
+function buildMeasureCells(row) {
+  const selected = new Set();
+  row.querySelectorAll('.measure-cell.selected').forEach(c => selected.add(+c.dataset.measure));
+  row.querySelectorAll('.measure-cell').forEach(c => c.remove());
+  const mw = MEASURE_W * scaleX;
+  for (let m = 0; m < TOTAL_MEASURES; m++) {
+    const cell = document.createElement('div');
+    cell.className = 'measure-cell' + (selected.has(m) ? ' selected' : '');
+    cell.dataset.measure = m;
+    cell.style.left  = (m * mw) + 'px';
+    cell.style.width = (mw - 2) + 'px';
+    cell.innerHTML = `<span style="position:absolute;top:3px;left:5px;font-family:var(--mono);font-size:0.5rem;color:rgba(255,255,255,0.2);pointer-events:none;user-select:none;">${m + 1}</span>`;
+    cell.addEventListener('touchend', e => {
+      if (panMoved) return;
+      e.stopPropagation();
+      e.preventDefault();
+      handleMeasureTap(cell, +row.dataset.trackIndex, m);
+    }, { passive: false });
+    cell.addEventListener('click', () => handleMeasureTap(cell, +row.dataset.trackIndex, m));
+    row.appendChild(cell);
+  }
+}
+
+function updateTrackGrids() {
+  const sig   = G ? G.timeSig : setup.timeSig;
+  const beats = parseInt(sig.split('/')[0]) || 4;
+  const mw    = MEASURE_W * scaleX;
+  const beatW = mw / beats;
+  const measureColor = 'rgba(255,255,255,0.12)';
+  const beatColor    = 'rgba(255,255,255,0.04)';
+  const bg = `
+    repeating-linear-gradient(90deg,
+      transparent 0px,
+      transparent ${mw - 2}px,
+      ${measureColor} ${mw - 2}px,
+      ${measureColor} ${mw}px
+    ),
+    repeating-linear-gradient(90deg,
+      transparent 0px,
+      transparent ${beatW - 1}px,
+      ${beatColor} ${beatW - 1}px,
+      ${beatColor} ${beatW}px
+    )
+  `;
+  document.querySelectorAll('.track-row').forEach(r => {
+    r.style.backgroundImage = bg;
+    r.style.width = (TOTAL_MEASURES * mw) + 'px';
+    buildMeasureCells(r);
+  });
+}
+
+// ── Instrument Panel ──
+const instrumentPanel = document.getElementById('instrument-panel');
+const instrumentPanelInner = document.getElementById('instrument-panel-inner');
+
+function renderInstrument(instrumentId) {
+  instrumentPanelInner.innerHTML = '';
+  if (instrumentId === 'drums') {
+    renderDrums();
+  } else {
+    renderPiano(instrumentId);
+  }
+}
+
+function renderPiano(instrumentId) {
+  // 5 octaves: C2–B6
+  const START_OCTAVE = 2;
+  const NUM_OCTAVES  = 5;
+  const WHITE_W      = 44;
+  const BLACK_W      = 28;
+  const NOTE_NAMES   = ['C','D','E','F','G','A','B'];
+  // semitone offsets of black keys within an octave (after C,D,E,F,G,A,B)
+  // black key positions as fraction of white key width from left edge of white key
+  const BLACK_AFTER  = [0,1,3,4,5]; // indices of white keys that have a black key to their right (C D F G A)
+
+  const container = document.createElement('div');
+  container.id = 'piano-container';
+
+  const keys = document.createElement('div');
+  keys.id = 'piano-keys';
+
+  const panelH = instrumentPanelInner.offsetHeight || 200;
+  const blackH = Math.round(panelH * 0.62);
+
+  let whiteIndex = 0;
+
+  for (let oct = START_OCTAVE; oct < START_OCTAVE + NUM_OCTAVES; oct++) {
+    for (let w = 0; w < 7; w++) {
+      const noteName = NOTE_NAMES[w] + oct;
+
+      // White key
+      const white = document.createElement('div');
+      white.className = 'piano-white';
+      white.dataset.note = noteName;
+      const label = document.createElement('div');
+      label.className = 'piano-white-label';
+      if (w === 0) label.textContent = 'C' + oct;
+      white.appendChild(label);
+
+      white.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        white.classList.add('pressed');
+        playNote(noteName, instrumentId);
+      });
+      white.addEventListener('pointerup',    () => white.classList.remove('pressed'));
+      white.addEventListener('pointerleave', () => white.classList.remove('pressed'));
+
+      keys.appendChild(white);
+
+      // Black key to the right of this white key?
+      if (BLACK_AFTER.includes(w)) {
+        const black = document.createElement('div');
+        black.className = 'piano-black';
+        black.style.height = blackH + 'px';
+        black.style.left = (whiteIndex * WHITE_W + WHITE_W - BLACK_W / 2 + 16) + 'px'; // +16 for padding
+        const blackNote = NOTE_NAMES[w] + '#' + oct;
+        black.dataset.note = blackNote;
+
+        black.addEventListener('pointerdown', e => {
+          e.preventDefault();
+          black.classList.add('pressed');
+          playNote(blackNote, instrumentId);
+        });
+        black.addEventListener('pointerup',    () => black.classList.remove('pressed'));
+        black.addEventListener('pointerleave', () => black.classList.remove('pressed'));
+
+        keys.appendChild(black);
+      }
+
+      whiteIndex++;
+    }
+  }
+
+  // Total width
+  const totalWhites = NUM_OCTAVES * 7;
+  keys.style.width = (totalWhites * WHITE_W + 32) + 'px'; // +32 for padding
+
+  container.appendChild(keys);
+  instrumentPanelInner.appendChild(container);
+
+  // Scroll so C4 is centered
+  // C4 is the start of octave 4, white key index = (4 - START_OCTAVE) * 7 = 14
+  const c4WhiteIndex = (4 - START_OCTAVE) * 7;
+  const c4Left = c4WhiteIndex * WHITE_W + 16; // +16 for padding
+  const scrollTo = c4Left - (container.offsetWidth / 2) + (WHITE_W / 2);
+  container.scrollLeft = scrollTo;
+}
+
+function renderDrums() {
+  const PADS = [
+    { id: 'kick',      label: 'Kick',    icon: '🔵', color: '#1a3a5c' },
+    { id: 'snare',     label: 'Snare',   icon: '⚪', color: '#3a2a1a' },
+    { id: 'hihat_c',   label: 'Hi-Hat',  icon: '🟡', color: '#2a2a10' },
+    { id: 'hihat_o',   label: 'Open HH', icon: '🟠', color: '#2a1a08' },
+    { id: 'crash',     label: 'Crash',   icon: '💥', color: '#2a1a2a' },
+    { id: 'ride',      label: 'Ride',    icon: '✨', color: '#1a2a2a' },
+    { id: 'tom_hi',    label: 'Hi Tom',  icon: '🔴', color: '#2a1010' },
+    { id: 'tom_mid',   label: 'Mid Tom', icon: '🟤', color: '#1e1408' },
+    { id: 'tom_floor', label: 'Floor',   icon: '🟣', color: '#1a1028' },
+    { id: 'rimshot',   label: 'Rim',     icon: '⭕', color: '#0e2010' },
+    { id: 'clap',      label: 'Clap',    icon: '👏', color: '#281818' },
+    { id: 'cowbell',   label: 'Cowbell', icon: '🔔', color: '#1c1c08' },
+  ];
+
+  const grid = document.createElement('div');
+  grid.id = 'drum-grid';
+
+  PADS.forEach(pad => {
+    const el = document.createElement('div');
+    el.className = 'drum-pad';
+    el.style.background = pad.color;
+    el.style.borderColor = shiftColor(pad.color, 40);
+    el.innerHTML = `<div class="drum-pad-icon">${pad.icon}</div><div class="drum-pad-label">${pad.label}</div>`;
+
+    el.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      el.classList.add('pressed');
+      playDrum(pad.id);
+    });
+    el.addEventListener('pointerup',    () => el.classList.remove('pressed'));
+    el.addEventListener('pointerleave', () => el.classList.remove('pressed'));
+
+    grid.appendChild(el);
+  });
+
+  instrumentPanelInner.appendChild(grid);
+}
+
+function shiftColor(hex, amount) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.min(255, ((n >> 16) & 0xff) + amount);
+  const g = Math.min(255, ((n >>  8) & 0xff) + amount);
+  const b = Math.min(255,  (n        & 0xff) + amount);
+  return `rgb(${r},${g},${b})`;
+}
+
+function playDrum(id) {
+  const ctx = getAudioCtx();
+  const now = ctx.currentTime;
+
+  if (id === 'kick') {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(40, now + 0.15);
+    gain.gain.setValueAtTime(1.0, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(now); osc.stop(now + 0.4);
+
+  } else if (id === 'snare') {
+    // Tone component
+    const osc = ctx.createOscillator();
+    const oscGain = ctx.createGain();
+    osc.frequency.value = 200;
+    oscGain.gain.setValueAtTime(0.7, now);
+    oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    osc.connect(oscGain); oscGain.connect(ctx.destination);
+    osc.start(now); osc.stop(now + 0.15);
+    // Noise component
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.2, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const noise = ctx.createBufferSource();
+    noise.buffer = buf;
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'highpass'; noiseFilter.frequency.value = 1000;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.8, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(ctx.destination);
+    noise.start(now); noise.stop(now + 0.2);
+
+  } else if (id === 'hihat_c') {
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const noise = ctx.createBufferSource(); noise.buffer = buf;
+    const f = ctx.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 7000;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.5, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+    noise.connect(f); f.connect(g); g.connect(ctx.destination);
+    noise.start(now); noise.stop(now + 0.05);
+
+  } else if (id === 'hihat_o') {
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.35, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const noise = ctx.createBufferSource(); noise.buffer = buf;
+    const f = ctx.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 6000;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.5, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    noise.connect(f); f.connect(g); g.connect(ctx.destination);
+    noise.start(now); noise.stop(now + 0.35);
+
+  } else if (id === 'crash') {
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 1.5, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const noise = ctx.createBufferSource(); noise.buffer = buf;
+    const f = ctx.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 5000;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.6, now); g.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+    noise.connect(f); f.connect(g); g.connect(ctx.destination);
+    noise.start(now); noise.stop(now + 1.5);
+
+  } else if (id === 'ride') {
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.4, now);
+    master.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+    master.connect(ctx.destination);
+    const modGain = ctx.createGain(); modGain.gain.value = 800;
+    const mod = ctx.createOscillator(); mod.frequency.value = 439;
+    const car = ctx.createOscillator(); car.frequency.value = 550;
+    mod.connect(modGain); modGain.connect(car.frequency); car.connect(master);
+    mod.start(now); car.start(now); mod.stop(now + 1.0); car.stop(now + 1.0);
+
+  } else if (id === 'tom_hi') {
+    const osc = ctx.createOscillator(); const g = ctx.createGain();
+    osc.frequency.setValueAtTime(300, now);
+    osc.frequency.exponentialRampToValueAtTime(180, now + 0.15);
+    g.gain.setValueAtTime(0.8, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+    osc.connect(g); g.connect(ctx.destination); osc.start(now); osc.stop(now + 0.25);
+
+  } else if (id === 'tom_mid') {
+    const osc = ctx.createOscillator(); const g = ctx.createGain();
+    osc.frequency.setValueAtTime(200, now);
+    osc.frequency.exponentialRampToValueAtTime(110, now + 0.2);
+    g.gain.setValueAtTime(0.8, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc.connect(g); g.connect(ctx.destination); osc.start(now); osc.stop(now + 0.3);
+
+  } else if (id === 'tom_floor') {
+    const osc = ctx.createOscillator(); const g = ctx.createGain();
+    osc.frequency.setValueAtTime(120, now);
+    osc.frequency.exponentialRampToValueAtTime(60, now + 0.3);
+    g.gain.setValueAtTime(0.9, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+    osc.connect(g); g.connect(ctx.destination); osc.start(now); osc.stop(now + 0.4);
+
+  } else if (id === 'rimshot') {
+    const osc = ctx.createOscillator(); const g = ctx.createGain();
+    osc.type = 'square'; osc.frequency.value = 1600;
+    g.gain.setValueAtTime(0.4, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+    osc.connect(g); g.connect(ctx.destination); osc.start(now); osc.stop(now + 0.06);
+
+  } else if (id === 'clap') {
+    [0, 0.01, 0.02].forEach(offset => {
+      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.15, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      const noise = ctx.createBufferSource(); noise.buffer = buf;
+      const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1200; f.Q.value = 0.8;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.6, now + offset); g.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.15);
+      noise.connect(f); f.connect(g); g.connect(ctx.destination);
+      noise.start(now + offset); noise.stop(now + offset + 0.15);
+    });
+
+  } else if (id === 'cowbell') {
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.5, now);
+    master.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+    master.connect(ctx.destination);
+    [562, 845].forEach(f => {
+      const osc = ctx.createOscillator(); osc.type = 'square'; osc.frequency.value = f;
+      const g = ctx.createGain(); g.gain.value = 0.5;
+      osc.connect(g); g.connect(master); osc.start(now); osc.stop(now + 0.8);
+    });
+  }
+}
+
+// ── Web Audio ──
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// ── Note Data Model ──
+// Each note: { note, midi, velocity, start, duration }
+//   note     — string e.g. "C#4"
+//   midi     — MIDI note number 0–127
+//   velocity — 0–127 (defaults to 100 for tap input)
+//   start    — position in beats from measure start (0.0 = downbeat)
+//   duration — length in beats (e.g. 0.5 = eighth note at any BPM)
+
+function noteToMidi(note) {
+  const match = note.match(/^([A-G])(#|b)?(\d+)$/);
+  if (!match) return 69; // fallback to A4
+  const names = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+  let semitone = names[match[1]];
+  if (match[2] === '#') semitone++;
+  if (match[2] === 'b') semitone--;
+  const octave = parseInt(match[3]);
+  return (octave + 1) * 12 + semitone;
+}
+
+function midiToFreq(midi) {
+  return 440 * Math.pow(2, (midi - 69) / 12);
+}
+
+function createNote(noteName, start = 0, duration = 0.5, velocity = 100) {
+  return {
+    note:     noteName,
+    midi:     noteToMidi(noteName),
+    velocity: Math.max(0, Math.min(127, velocity)),
+    start,
+    duration,
+  };
+}
+
+function noteToFreq(note) {
+  return midiToFreq(noteToMidi(note));
+}
+
+function playNote(note, instrumentId) {
+  const ctx  = getAudioCtx();
+  const freq = noteToFreq(note);
+  const now  = ctx.currentTime;
+
+  if (instrumentId === 'piano') {
+    // Piano: two detuned triangle oscillators + fast decay
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.4, now);
+    master.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+    master.connect(ctx.destination);
+
+    [-4, 4].forEach(detune => {
+      const osc = ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.value = freq;
+      osc.detune.value = detune;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(1, now);
+      g.gain.exponentialRampToValueAtTime(0.3, now + 0.1);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + 2.5);
+    });
+
+  } else if (instrumentId === 'bass') {
+    // Bass: sine + sub octave, punchy
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0, now);
+    master.gain.linearRampToValueAtTime(0.6, now + 0.01);
+    master.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+    master.connect(ctx.destination);
+
+    [1, 0.5].forEach((mult, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq * mult;
+      const g = ctx.createGain();
+      g.gain.value = i === 0 ? 0.7 : 0.4;
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + 1.2);
+    });
+
+  } else if (instrumentId === 'lead') {
+    // Lead: sawtooth with filter sweep
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0, now);
+    master.gain.linearRampToValueAtTime(0.3, now + 0.02);
+    master.gain.setValueAtTime(0.3, now + 0.3);
+    master.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+    master.connect(ctx.destination);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(freq * 4, now);
+    filter.frequency.exponentialRampToValueAtTime(freq * 1.5, now + 0.3);
+    filter.Q.value = 4;
+    filter.connect(master);
+
+    const osc = ctx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.value = freq;
+    osc.connect(filter);
+    osc.start(now);
+    osc.stop(now + 1.0);
+
+  } else if (instrumentId === 'pad') {
+    // Pad: soft sine cluster, slow attack
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0, now);
+    master.gain.linearRampToValueAtTime(0.25, now + 0.4);
+    master.gain.setValueAtTime(0.25, now + 1.5);
+    master.gain.exponentialRampToValueAtTime(0.001, now + 3.0);
+    master.connect(ctx.destination);
+
+    [-7, 0, 7, 12].forEach(detune => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      osc.detune.value = detune;
+      osc.connect(master);
+      osc.start(now);
+      osc.stop(now + 3.0);
+    });
+
+  } else if (instrumentId === 'organ') {
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.25, now);
+    master.gain.setValueAtTime(0.001, now + 1.2);
+    master.connect(ctx.destination);
+    [1, 2, 3, 4].forEach((harmonic, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq * harmonic;
+      const g = ctx.createGain(); g.gain.value = 1 / (i + 1);
+      osc.connect(g); g.connect(master);
+      osc.start(now); osc.stop(now + 1.2);
+    });
+
+  } else if (instrumentId === 'vibraphone') {
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.4, now);
+    master.gain.exponentialRampToValueAtTime(0.001, now + 3.5);
+    master.connect(ctx.destination);
+    const modGain = ctx.createGain();
+    modGain.gain.setValueAtTime(freq * 2, now);
+    modGain.gain.exponentialRampToValueAtTime(freq * 0.1, now + 1.0);
+    const modulator = ctx.createOscillator();
+    modulator.type = 'sine'; modulator.frequency.value = freq * 2.756;
+    const carrier = ctx.createOscillator();
+    carrier.type = 'sine'; carrier.frequency.value = freq;
+    modulator.connect(modGain); modGain.connect(carrier.frequency);
+    carrier.connect(master);
+    modulator.start(now); carrier.start(now);
+    modulator.stop(now + 3.5); carrier.stop(now + 3.5);
+
+  } else if (instrumentId === 'plucked') {
+    const bufSize = Math.round(ctx.sampleRate / freq);
+    const buffer  = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data    = buffer.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+    const source = ctx.createBufferSource();
+    source.buffer = buffer; source.loop = true;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass'; filter.frequency.value = freq * 8;
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.5, now);
+    master.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+    source.connect(filter); filter.connect(master); master.connect(ctx.destination);
+    source.start(now); source.stop(now + 2.5);
+
+  } else if (instrumentId === 'flute') {
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0, now);
+    master.gain.linearRampToValueAtTime(0.3, now + 0.08);
+    master.gain.setValueAtTime(0.3, now + 0.8);
+    master.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+    master.connect(ctx.destination);
+    const osc = ctx.createOscillator();
+    osc.type = 'sine'; osc.frequency.value = freq;
+    osc.connect(master); osc.start(now); osc.stop(now + 1.8);
+    const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+    const nd = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'bandpass'; noiseFilter.frequency.value = freq; noiseFilter.Q.value = 12;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0, now);
+    noiseGain.gain.linearRampToValueAtTime(0.04, now + 0.08);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+    noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(ctx.destination);
+    noise.start(now); noise.stop(now + 1.8);
+
+  } else if (instrumentId === 'brass') {
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0, now);
+    master.gain.linearRampToValueAtTime(0.4, now + 0.04);
+    master.gain.setValueAtTime(0.4, now + 0.5);
+    master.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
+    master.connect(ctx.destination);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(freq * 1.5, now);
+    filter.frequency.exponentialRampToValueAtTime(freq * 6, now + 0.04);
+    filter.frequency.exponentialRampToValueAtTime(freq * 2, now + 0.5);
+    filter.Q.value = 2.5; filter.connect(master);
+    const osc = ctx.createOscillator();
+    osc.type = 'sawtooth'; osc.frequency.value = freq;
+    osc.connect(filter); osc.start(now); osc.stop(now + 1.4);
+
+  } else if (instrumentId === 'harpsichord') {
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.5, now);
+    master.gain.exponentialRampToValueAtTime(0.3, now + 0.02);
+    master.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+    master.connect(ctx.destination);
+    [1, 2, 3].forEach((harmonic, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sawtooth'; osc.frequency.value = freq * harmonic;
+      const g = ctx.createGain(); g.gain.value = 1 / (i + 1);
+      osc.connect(g); g.connect(master);
+      osc.start(now); osc.stop(now + 0.8);
+    });
+
+  } else {
+    // Fallback: simple sine
+    const osc = ctx.createOscillator();
+    const g   = ctx.createGain();
+    g.gain.setValueAtTime(0.3, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+    osc.frequency.value = freq;
+    osc.connect(g);
+    g.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 1.0);
+  }
+}
+
+// ── Measure Zoom ──
+let measureZoomed = false;
+let lastTapTime = 0, lastTapCell = null;
+const ZOOM_DURATION = 750;
+
+let savedPanX, savedScaleX, savedPanY, savedHeaderColW, savedZoomBarH;
+let zoomedTrackIndex = -1;
+let zoomedMeasureIndex = -1;
+
+function easeInOut(t) {
+  return t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+}
+
+function updateCellPositions(row) {
+  const mw = MEASURE_W * scaleX;
+  row.querySelectorAll('.measure-cell').forEach(cell => {
+    const m = +cell.dataset.measure;
+    cell.style.left  = (m * mw) + 'px';
+    cell.style.width = (mw - 2) + 'px';
+  });
+}
+
+function updateTrackGridsLight() {
+  const sig   = G ? G.timeSig : setup.timeSig;
+  const beats = parseInt(sig.split('/')[0]) || 4;
+  const mw    = MEASURE_W * scaleX;
+  const beatW = mw / beats;
+  const mc = 'rgba(255,255,255,0.12)', bc = 'rgba(255,255,255,0.04)';
+  const bg = `repeating-linear-gradient(90deg,transparent 0px,transparent ${mw-2}px,${mc} ${mw-2}px,${mc} ${mw}px),repeating-linear-gradient(90deg,transparent 0px,transparent ${beatW-1}px,${bc} ${beatW-1}px,${bc} ${beatW}px)`;
+  document.querySelectorAll('.track-row').forEach(r => {
+    r.style.backgroundImage = bg;
+    r.style.width = (TOTAL_MEASURES * mw) + 'px';
+    updateCellPositions(r);
+  });
+  canvas.style.width = (TOTAL_MEASURES * MEASURE_W * scaleX) + 'px';
+}
+
+function animateMeasureZoom(from, to, onDone) {
+  if (zoomAnimFrame) cancelAnimationFrame(zoomAnimFrame);
+  const headerCol = document.getElementById('track-header-col');
+  const zoomBar   = document.getElementById('zoom-bar');
+  const trackList = document.getElementById('track-list');
+  const rows      = Array.from(document.querySelectorAll('.track-row'));
+  const headers   = Array.from(document.querySelectorAll('.track-header'));
+
+  // Disable CSS transitions on things we're manually animating
+  headerCol.style.transition = 'none';
+  document.querySelectorAll('.track-header').forEach(h => h.style.transition = 'none');
+
+  const start = performance.now();
+  function step(now) {
+    const raw = Math.min(1, (now - start) / ZOOM_DURATION);
+    const t   = easeInOut(raw);
+
+    // Pan & scale
+    scaleX = from.scaleX + (to.scaleX - from.scaleX) * t;
+    panX   = from.panX   + (to.panX   - from.panX)   * t;
+    panY   = from.panY   + (to.panY   - from.panY)   * t;
+
+    // Header col width collapses for layout; content slides left at full width
+    const hw = from.headerColW + (to.headerColW - from.headerColW) * t;
+    headerCol.style.width = hw + 'px';
+    const fullW = from.headerColW || to.headerColW;
+    const slideX = -(fullW - hw);
+    headerList.style.transform = `translateX(${slideX}px) translateY(${panY}px)`;
+    headers.forEach(h => h.style.width = fullW + 'px');
+
+    // Zoom bar — wrapper collapses, bar slides up
+    const zh = from.zoomBarH + (to.zoomBarH - from.zoomBarH) * t;
+    document.getElementById('zoom-bar-wrap').style.height = zh + 'px';
+    zoomBar.style.transform = `translateY(${zh - 28}px)`;
+
+    // Row heights + borders
+    rows.forEach((r, i) => {
+      const rh = i === zoomedTrackIndex
+        ? from.targetRowH + (to.targetRowH - from.targetRowH) * t
+        : from.otherRowH  + (to.otherRowH  - from.otherRowH)  * t;
+      r.style.height = rh + 'px';
+      const bw = i === zoomedTrackIndex
+        ? (to.targetRowH < from.targetRowH ? t : 1 - t) // fade out on zoom-in, in on zoom-out
+        : from.otherRowH > 0 ? (1 - t) : 0;
+      r.style.borderTopWidth    = bw + 'px';
+      r.style.borderBottomWidth = bw + 'px';
+    });
+    trackList.style.gap = (from.gap + (to.gap - from.gap) * t) + 'px';
+
+    // Instrument panel slide
+    if (from.panelY !== undefined) {
+      const py = from.panelY + (to.panelY - from.panelY) * t;
+      instrumentPanel.style.transform = `translateY(${py}%)`;
+    }
+
+    // Light grid/canvas update
+    updateTrackGridsLight();
+    applyTransform();
+
+    if (raw < 1) {
+      zoomAnimFrame = requestAnimationFrame(step);
+    } else {
+      zoomAnimFrame = null;
+      if (onDone) onDone();
+    }
+  }
+  zoomAnimFrame = requestAnimationFrame(step);
+}
+
+function zoomIntoMeasure(trackIndex, measureIndex) {
+  if (measureZoomed || zoomAnimFrame) return;
+  measureZoomed    = true;
+  zoomedTrackIndex   = trackIndex;
+  zoomedMeasureIndex = measureIndex;
+
+  const headerCol = document.getElementById('track-header-col');
+  const gameBody  = document.getElementById('game-body');
+  const backBtn   = document.getElementById('measure-back-btn');
+
+  const currentHeaderW = drawerOpen ? HEADER_W_OPEN : HEADER_W_CLOSED;
+  savedPanX       = panX;
+  savedScaleX     = scaleX;
+  savedPanY       = panY;
+  savedHeaderColW = currentHeaderW;
+  savedZoomBarH   = 28;
+
+  const viewW     = gameBody.offsetWidth;
+  const gameBodyH = gameBody.offsetHeight;
+  const panelH    = Math.floor(gameBodyH / 2);
+  const toScaleX  = viewW / MEASURE_W;
+  const toPanX    = viewW / 2 - (measureIndex + 0.5) * MEASURE_W * toScaleX;
+
+  // Resolve instrument for this track
+  const instrumentId = G && G.tracks[trackIndex] ? G.tracks[trackIndex].instrument : 'piano';
+
+  // Prepare instrument panel — render content before animating in
+  const panelTop = gameBodyH - panelH;
+  instrumentPanel.style.top    = panelTop + 'px';
+  instrumentPanel.style.bottom = '0';
+  instrumentPanel.style.height = 'auto';
+  instrumentPanel.style.transform = `translateY(101%)`;
+  renderInstrument(instrumentId);
+
+  animateMeasureZoom(
+    { panX: savedPanX, scaleX: savedScaleX, panY, headerColW: currentHeaderW, zoomBarH: 28, targetRowH: 80, otherRowH: 80, gap: 4, panelY: 100 },
+    { panX: toPanX,    scaleX: toScaleX,    panY: 0, headerColW: 0, zoomBarH: 0, targetRowH: panelH, otherRowH: 0, gap: 0, panelY: 0 },
+    () => {
+      updateTrackGrids();
+      // Fade in back button
+      backBtn.style.display = 'block';
+      requestAnimationFrame(() => backBtn.style.opacity = '1');
+    }
+  );
+}
+
+function zoomOutMeasure() {
+  if (!measureZoomed || zoomAnimFrame) return;
+
+  const headerCol = document.getElementById('track-header-col');
+  const gameBody  = document.getElementById('game-body');
+  const backBtn   = document.getElementById('measure-back-btn');
+  const gameBodyH = gameBody.offsetHeight;
+  const panelH    = Math.floor(gameBodyH / 2);
+
+  const currentHeaderW = drawerOpen ? HEADER_W_OPEN : HEADER_W_CLOSED;
+
+  // Fade out back button, then animate
+  backBtn.style.opacity = '0';
+  setTimeout(() => {
+    backBtn.style.display = 'none';
+    animateMeasureZoom(
+      { panX, scaleX, panY: 0, headerColW: 0, zoomBarH: 0, targetRowH: panelH, otherRowH: 0, gap: 0, panelY: 0 },
+      { panX: savedPanX, scaleX: savedScaleX, panY: savedPanY, headerColW: savedHeaderColW, zoomBarH: savedZoomBarH, targetRowH: 80, otherRowH: 80, gap: 4, panelY: 100 },
+      () => {
+        measureZoomed = false;
+        zoomedTrackIndex   = -1;
+        zoomedMeasureIndex = -1;
+        const restoredW = drawerOpen ? HEADER_W_OPEN : HEADER_W_CLOSED;
+        headerCol.style.transition = '';
+        headerList.style.transform = `translateY(${panY}px)`;
+        headerCol.style.width = restoredW + 'px';
+        document.getElementById('add-track-btn').style.width = restoredW + 'px';
+        document.getElementById('zoom-bar').style.paddingLeft = (restoredW + 1) + 'px';
+        document.getElementById('zoom-bar-wrap').style.height = '';
+        document.getElementById('zoom-bar').style.transform = '';
+        document.querySelectorAll('.track-header').forEach(h => {
+          h.style.transition = '';
+          h.style.width = restoredW + 'px';
+        });
+        document.querySelectorAll('.track-row').forEach(r => {
+          r.style.height = '';
+          r.style.borderTopWidth = '';
+          r.style.borderBottomWidth = '';
+        });
+        document.getElementById('track-list').style.gap = '';
+        instrumentPanel.style.height = '0';
+        instrumentPanel.style.transform = '';
+        instrumentPanel.style.top = '';
+        instrumentPanel.style.bottom = '0';
+        instrumentPanelInner.innerHTML = '';
+        updateTrackGrids();
+        applyTransform();
+      }
+    );
+  }, 200); // wait for fade-out transition
+}
+
+function handleMeasureTap(cell, trackIndex, measureIndex) {
+  const now = Date.now();
+  if (lastTapCell === cell && now - lastTapTime < 350) {
+    lastTapCell = null;
+    lastTapTime = 0;
+    zoomIntoMeasure(trackIndex, measureIndex);
+  } else {
+    lastTapCell = cell;
+    lastTapTime = now;
+    if (!measureZoomed) cell.classList.toggle('selected');
+  }
+}
+
+let trackCount = 0;
+
+function addTrack(name, instrument) {
+  const index = document.getElementById('track-header-list').querySelectorAll('.track-header').length;
+
+  const header = document.createElement('div');
+  header.className = 'track-header';
+  header.dataset.trackIndex = index;
+  header.innerHTML = `
+    <div class="track-header-inner" onclick="openEditTrackModal(${index})">
+      <div class="track-header-identity">
+        <div class="track-header-name"><div class="track-header-name-line">${splitTrackName(name)[0]}</div><div class="track-header-name-line">${splitTrackName(name)[1]}</div></div>
+        <div class="track-icon">${instrument.icon}</div>
+      </div>
+      <div class="track-header-controls" onclick="event.stopPropagation()">
+        <button class="track-ms-btn mute-btn" title="Mute">M</button>
+        <button class="track-ms-btn solo-btn" title="Solo">S</button>
+        <button class="track-ms-btn vol-btn" title="Volume">🔉</button>
+      </div>
+    </div>
+    <button class="track-header-drawer-btn">❯</button>
+  `;
+  const drawerBtn = header.querySelector('.track-header-drawer-btn');
+  drawerBtn.addEventListener('touchstart', e => { e.stopPropagation(); e.preventDefault(); toggleDrawer(); }, { passive: false });
+  drawerBtn.addEventListener('click',      e => { e.stopPropagation(); toggleDrawer(); });
+
+  header.querySelectorAll('.track-ms-btn').forEach(btn => {
+    if (btn.classList.contains('vol-btn')) {
+      btn.addEventListener('click',      e => { e.stopPropagation(); openVolumeModal(index); });
+      btn.addEventListener('touchstart', e => { e.stopPropagation(); }, { passive: true });
+    } else if (btn.classList.contains('mute-btn')) {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        if (!canEdit()) return;
+        btn.classList.toggle('active');
+        const muted = btn.classList.contains('active');
+        const trackIdx = parseInt(header.dataset.trackIndex);
+        header.classList.toggle('muted', muted);
+        const rows = document.getElementById('track-list').querySelectorAll('.track-row');
+        if (rows[trackIdx]) rows[trackIdx].classList.toggle('muted', muted);
+        if (G && G.tracks[trackIdx]) { pushUndo(); G.tracks[trackIdx].muted = muted; }
+      });
+      btn.addEventListener('touchstart', e => { e.stopPropagation(); }, { passive: true });
+    } else if (btn.classList.contains('solo-btn')) {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        btn.classList.toggle('active');
+        applySolo();
+      });
+      btn.addEventListener('touchstart', e => { e.stopPropagation(); }, { passive: true });
+    }
+  });
+
+  const btn = document.getElementById('add-track-btn');
+  document.getElementById('track-header-list').insertBefore(header, btn);
+
+  // Apply current drawer state
+  if (drawerOpen) {
+    const drawerBtn = header.querySelector('.track-header-drawer-btn');
+    header.style.width = HEADER_W_OPEN + 'px';
+    drawerBtn.textContent = '❮';
+    header.querySelector('.track-header-name').style.display = 'block';
+    header.querySelector('.track-header-controls').style.display = 'flex';
+    header.querySelector('.track-header-inner').style.alignItems = 'center';
+    header.querySelector('.track-header-inner').style.padding = '0.4rem 0.3rem';
+  }
+
+  const row = document.createElement('div');
+  row.className = 'track-row';
+  row.dataset.trackIndex = index;
+  document.getElementById('track-list').appendChild(row);
+  updateTrackGrids();
+  buildMeasureCells(row);
+
+  if (G && !G._rebuilding) { pushUndo(); G.tracks.push({ name, instrument: instrument.id, notes: [] }); }
+  applyTransform();
+}
+
+// ── Turn History Modal ──
+function openHistoryModal() {
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+  const history = turnHistory || [];
+  if (!history.length) {
+    list.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;padding:2rem;font-family:var(--mono);font-size:0.75rem;color:var(--text-faint);">No turns recorded yet.</div>';
+  } else {
+    history.forEach((entry, i) => {
+      const date = new Date(entry.timestamp);
+      const timeStr = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+        + ' ' + date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+      const el = document.createElement('div');
+      el.className = 'history-entry';
+      el.dataset.index = i;
+      el.innerHTML = `
+        <div class="history-entry-header">
+          <span class="history-entry-turn">Turn ${entry.turn}</span>
+          <span class="history-entry-composer">${entry.composer || '—'}</span>
+          ${entry.notes ? `<span class="history-entry-notes-inline">${entry.notes}</span>` : ''}
+        </div>
+        <div class="history-entry-time">${timeStr}</div>
+      `;
+      el.dataset.snapshot = entry.snapshot || '';
+      el.addEventListener('click', () => {
+        list.querySelectorAll('.history-entry').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('history-view-btn').disabled = false;
+        document.getElementById('history-restore-btn').disabled = false;
+      });
+      list.appendChild(el);
+    });
+  }
+  // Always append a "current" entry representing the state right now
+  const now = new Date();
+  const nowStr = now.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+    + ' ' + now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  const currentEl = document.createElement('div');
+  currentEl.className = 'history-entry history-entry-current';
+  currentEl.dataset.snapshot = isRestored ? (currentSnapshot || '') : (currentSnapshot = JSON.stringify(G));  currentEl.innerHTML = `
+    <div class="history-entry-header">
+      <span class="history-entry-turn">Turn ${G ? G.turnNumber : '—'}</span>
+      <span class="history-entry-composer" style="color:var(--text-dim);font-style:italic;">Current</span>
+      <span class="history-entry-time">${nowStr}</span>
+    </div>
+  `;
+  currentEl.addEventListener('click', () => {
+    list.querySelectorAll('.history-entry').forEach(e => e.classList.remove('selected'));
+    currentEl.classList.add('selected');
+    document.getElementById('history-view-btn').disabled = false;
+    document.getElementById('history-restore-btn').disabled = false;
+  });
+  list.appendChild(currentEl);
+  document.getElementById('history-view-btn').disabled = true;
+  document.getElementById('history-restore-btn').disabled = true;
+  document.getElementById('history-overlay').style.display = 'flex';
+}
+function restoreHistoryEntry() {
+  const selected = document.getElementById('history-list').querySelector('.history-entry.selected');
+  if (!selected || !selected.dataset.snapshot) return;
+  G = JSON.parse(selected.dataset.snapshot);
+  isRestored = !selected.classList.contains('history-entry-current');
+  // turnHistory is untouched — it lives outside the snapshot
+  updateUndoRedoBtns();
+  refreshGameUI();
+  closeHistoryModal();
+  consoleMsg(isRestored ? `Viewing Turn ${G.turnNumber}. Return to Current to make changes.` : 'Returned to current.');
+}
+function hardRestoreHistoryEntry() {
+  const selected = document.getElementById('history-list').querySelector('.history-entry.selected');
+  if (!selected || !selected.dataset.snapshot) return;
+  const turnNum = JSON.parse(selected.dataset.snapshot).turnNumber;
+  pushUndo();
+  G = JSON.parse(selected.dataset.snapshot);
+  isRestored = false;
+  currentSnapshot = null;
+  updateUndoRedoBtns();
+  refreshGameUI();
+  closeHistoryModal();
+  consoleMsg(`Composition restored to Turn ${turnNum}. You can undo this action.`);
+}
+
+function closeHistoryModal() {
+  document.getElementById('history-overlay').style.display = 'none';
+}
+
+// ── Composition Info Modal ──
+function openInfoModal() {
+  document.getElementById('info-name').value  = G ? G.name  : '';
+  document.getElementById('info-notes').value = G ? G.notes : '';
+  document.getElementById('info-overlay').style.display = 'flex';
+  setTimeout(() => document.getElementById('info-name').focus(), 50);
+}
+function closeInfoModal() {
+  document.getElementById('info-overlay').style.display = 'none';
+}
+function confirmInfo() {
+  if (!G || !canEdit()) return closeInfoModal();
+  pushUndo();
+  G.name  = document.getElementById('info-name').value.trim() || 'Untitled';
+  G.notes = document.getElementById('info-notes').value;
+  document.getElementById('g-name').textContent = G.name;
+  consoleMsg('Composition info saved.');
+  closeInfoModal();
+}
+
+// ── Console ──
+
+function consoleMsg(text) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = text;
+  container.appendChild(toast);
+  // Pop in
+  requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('toast-visible')));
+  // Fade out after 2s
+  setTimeout(() => {
+    toast.classList.remove('toast-visible');
+    toast.classList.add('toast-hiding');
+    setTimeout(() => toast.remove(), 200);
+  }, 3000);
+}
+const TIME_SIGS = ['2/4', '3/4', '4/4', '5/4', '6/4', '7/4', '6/8', '7/8', '9/8', '12/8', '5/8', '3/8'];
+let selectedTimeSig = null;
+let tsNum = 4, tsDen = 4;
+let metronome = { running: false, ctx: null, beat: 0, timeout: null };
+
+function openTimeSigModal() {
+  const current = G ? G.timeSig : setup.timeSig;
+  selectedTimeSig = current;
+  const parts = current.split('/');
+  tsNum = parseInt(parts[0]) || 4;
+  tsDen = parseInt(parts[1]) || 4;
+  updateCustomDisplay();
+  const grid = document.getElementById('timesig-grid');
+  grid.innerHTML = '';
+  TIME_SIGS.forEach(sig => {
+    const btn = document.createElement('button');
+    btn.className = 'timesig-option' + (sig === selectedTimeSig ? ' selected' : '');
+    btn.textContent = sig;
+    btn.onclick = () => {
+      selectedTimeSig = sig;
+      const p = sig.split('/');
+      tsNum = parseInt(p[0]); tsDen = parseInt(p[1]);
+      updateCustomDisplay();
+      grid.querySelectorAll('.timesig-option').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    };
+    grid.appendChild(btn);
+  });
+  document.getElementById('timesig-overlay').style.display = 'flex';
+}
+
+function updateCustomDisplay() {
+  document.getElementById('ts-num').textContent = tsNum;
+  document.getElementById('ts-den').textContent = tsDen;
+  selectedTimeSig = tsNum + '/' + tsDen;
+  const grid = document.getElementById('timesig-grid');
+  if (grid) {
+    grid.querySelectorAll('.timesig-option').forEach(b => {
+      b.classList.toggle('selected', b.textContent === selectedTimeSig);
+    });
+  }
+}
+
+const DEN_VALUES = [2, 4, 8, 16];
+function stepTimeSig(part, delta) {
+  if (!canEdit()) return;
+  if (part === 'num') {
+    tsNum = Math.min(16, Math.max(1, tsNum + delta));
+  } else {
+    const idx = DEN_VALUES.indexOf(tsDen);
+    const next = idx + delta;
+    if (next >= 0 && next < DEN_VALUES.length) tsDen = DEN_VALUES[next];
+  }
+  updateCustomDisplay();
+}
+
+function closeTimeSigModal() {
+  stopMetronome();
+  document.getElementById('timesig-overlay').style.display = 'none';
+}
+
+function confirmTimeSig() {
+  if (!canEdit()) return;
+  stopMetronome();
+  setup.timeSig = selectedTimeSig;
+  const disp = document.getElementById('f-timesig-display');
+  if (disp) disp.textContent = selectedTimeSig;
+  if (G) {
+    pushUndo();
+    G.timeSig = selectedTimeSig;
+    document.getElementById('g-timesig').textContent = selectedTimeSig;
+  }
+  closeTimeSigModal();
+  updateTrackGrids();
+}
+
+function toggleMetronome() {
+  if (metronome.running) stopMetronome();
+  else startMetronome();
+}
+function startMetronome() {
+  metronome.ctx = new (window.AudioContext || window.webkitAudioContext)();
+  metronome.running = true;
+  metronome.beat = 0;
+  document.getElementById('metro-btn').textContent = '⏹';
+  scheduleBeat();
+}
+function stopMetronome() {
+  metronome.running = false;
+  if (metronome.timeout) clearTimeout(metronome.timeout);
+  const btn = document.getElementById('metro-btn');
+  if (btn) btn.textContent = '▶';
+}
+function scheduleBeat() {
+  if (!metronome.running) return;
+  const bpm = G ? G.bpm : setup.bpm;
+  const isAccent = metronome.beat % tsNum === 0;
+  const ctx = metronome.ctx;
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.frequency.value = isAccent ? 1000 : 700;
+  gain.gain.setValueAtTime(isAccent ? 0.4 : 0.2, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+  osc.start(now);
+  osc.stop(now + 0.08);
+  metronome.beat = (metronome.beat + 1) % tsNum;
+  metronome.timeout = setTimeout(scheduleBeat, (60 / bpm) * 1000);
+}
+
+// ── Rules Modal ──
+function openRulesModal() {
+  const current = G ? G.measuresPerTurn : setup.quota;
+  document.getElementById('quota-input').value = current;
+  document.getElementById('rules-overlay').style.display = 'flex';
+}
+function closeRulesModal() {
+  document.getElementById('rules-overlay').style.display = 'none';
+}
+function confirmRules() {
+  if (!canEdit()) return;
+  const val = parseInt(document.getElementById('quota-input').value);
+  if (val >= 1 && val <= 32) {
+    setup.quota = val;
+    const disp = document.getElementById('f-quota-display');
+    if (disp) disp.textContent = val;
+    if (G) {
+      pushUndo();
+      G.measuresPerTurn = val;
+      document.getElementById('g-quota').textContent = val;
+    }
+  }
+  closeRulesModal();
+}
+function stepQuota(delta) {
+  const input = document.getElementById('quota-input');
+  input.value = Math.min(32, Math.max(1, (parseInt(input.value) || 4) + delta));
+}
+
+// ── BPM Modal ──
+let bpmMetronome = { running: false, ctx: null, beat: 0, timeout: null };
+
+function openBpmModal() {
+  const current = G ? G.bpm : setup.bpm;
+  document.getElementById('bpm-input').value = current;
+  document.getElementById('bpm-overlay').style.display = 'flex';
+  setTimeout(() => document.getElementById('bpm-input').focus(), 50);
+}
+function closeBpmModal() {
+  stopBpmMetronome();
+  document.getElementById('bpm-overlay').style.display = 'none';
+}
+function confirmBpm() {
+  if (!canEdit()) return closeBpmModal();
+  const val = parseInt(document.getElementById('bpm-input').value);
+  if (val >= 40 && val <= 240) {
+    setup.bpm = val;
+    const disp = document.getElementById('f-bpm-display');
+    if (disp) disp.textContent = val;
+    if (G) {
+      pushUndo();
+      G.bpm = val;
+      document.getElementById('g-bpm').textContent = val;
+    }
+  }
+  closeBpmModal();
+}
+function stepBpm(delta) {
+  const input = document.getElementById('bpm-input');
+  input.value = Math.min(240, Math.max(40, (parseInt(input.value) || 120) + delta));
+}
+function toggleBpmMetronome() {
+  if (bpmMetronome.running) stopBpmMetronome();
+  else startBpmMetronome();
+}
+function startBpmMetronome() {
+  bpmMetronome.ctx = new (window.AudioContext || window.webkitAudioContext)();
+  bpmMetronome.running = true;
+  bpmMetronome.beat = 0;
+  document.getElementById('bpm-metro-btn').textContent = '⏹';
+  scheduleBpmBeat();
+}
+function stopBpmMetronome() {
+  bpmMetronome.running = false;
+  if (bpmMetronome.timeout) clearTimeout(bpmMetronome.timeout);
+  const btn = document.getElementById('bpm-metro-btn');
+  if (btn) btn.textContent = '▶';
+}
+function scheduleBpmBeat() {
+  if (!bpmMetronome.running) return;
+  const bpm = parseInt(document.getElementById('bpm-input').value) || 120;
+  const sig = G ? G.timeSig : setup.timeSig;
+  const beats = parseInt(sig.split('/')[0]) || 4;
+  const isAccent = bpmMetronome.beat % beats === 0;
+  const ctx = bpmMetronome.ctx;
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.frequency.value = isAccent ? 1000 : 700;
+  gain.gain.setValueAtTime(isAccent ? 0.4 : 0.2, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+  osc.start(now);
+  osc.stop(now + 0.08);
+  bpmMetronome.beat = (bpmMetronome.beat + 1) % beats;
+  bpmMetronome.timeout = setTimeout(scheduleBpmBeat, (60 / bpm) * 1000);
+}
+
+// ── Keyboard shortcuts ──
+// ── Orientation / Resize ──
+window.addEventListener('resize', () => {
+  clearTimeout(window._resizeTimer);
+  window._resizeTimer = setTimeout(() => {
+    if (!G) return;
+    if (measureZoomed) {
+      // Recalculate all zoom geometry from fresh dimensions
+      const gameBody    = document.getElementById('game-body');
+      const viewW       = gameBody.offsetWidth;
+      const gameBodyH   = gameBody.offsetHeight;
+      const panelH      = Math.floor(gameBodyH / 2);
+      const panelTop    = gameBodyH - panelH;
+      const toScaleX    = viewW / MEASURE_W;
+      const toPanX      = viewW / 2 - (zoomedMeasureIndex + 0.5) * MEASURE_W * toScaleX;
+
+      // Reposition panel
+      instrumentPanel.style.top    = panelTop + 'px';
+      instrumentPanel.style.bottom = '0';
+      instrumentPanel.style.height = 'auto';
+      instrumentPanel.style.transform = 'translateY(0%)';
+
+      // Reapply zoom transform
+      scaleX = toScaleX;
+      panX   = toPanX;
+
+      // Resize track rows
+      document.querySelectorAll('.track-row').forEach((row, i) => {
+        row.style.height = (i === zoomedTrackIndex ? panelH : 0) + 'px';
+        row.style.border = '0';
+      });
+      document.querySelectorAll('.track-header').forEach((h, i) => {
+        h.style.height = (i === zoomedTrackIndex ? panelH : 0) + 'px';
+        h.style.border = '0';
+      });
+
+      applyZoom();
+      applyTransform();
+      renderInstrument(G.tracks[zoomedTrackIndex] ? G.tracks[zoomedTrackIndex].instrument : 'piano');
+    } else {
+      applyZoom();
+      applyTransform();
+    }
+  }, 150);
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('bpm-overlay').style.display === 'flex') {
+    confirmBpm();
+  }
+  if (e.key === 'Escape') {
+    if (document.getElementById('bpm-overlay').style.display === 'flex') closeBpmModal();
+    if (document.getElementById('timesig-overlay').style.display === 'flex') closeTimeSigModal();
+    if (document.getElementById('volume-overlay').style.display === 'flex') closeVolumeModal();
+    if (document.getElementById('new-track-overlay').style.display === 'flex') closeNewTrackModal();
+    if (document.getElementById('instrument-picker-overlay').style.display === 'flex') closeInstrumentPicker();
+    if (document.getElementById('info-overlay').style.display === 'flex') closeInfoModal();
+    document.getElementById('toolbar-menu').classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>
